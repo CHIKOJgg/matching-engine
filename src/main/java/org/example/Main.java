@@ -16,6 +16,15 @@ public class Main {
         Comparator<Order> comparatorByPriceAndTimestamp = comparatorForOrders.thenComparing(copmaratorForOrdersByTimestamp);
         Comparator<Order> comparator1 = (o1, o2) -> o1.getPrice().compareTo(o2.getPrice());
         Comparator<Order> comparatorComparing =Comparator.comparing(Order::getPrice);
+        List<Order> list = new ArrayList<>();
+        IntStream.range(0,10).forEach(i->{
+            Order order = createNewOrder(Side.SELL);
+            list.add(order);
+        });
+        IntStream.range(0,list.size()).forEach(i-> System.out.print(list.get(i).getPrice()+" "));
+        Collections.sort(list);
+        System.out.println();
+        IntStream.range(0,list.size()).forEach(i-> System.out.print(list.get(i).getPrice()+" "));
         TreeMap<BigDecimal, Order> asks = new TreeMap<>(Comparator.reverseOrder());
         IntStream.range(0,10).forEach(i->{
             Order order = createNewOrder(Side.SELL);
