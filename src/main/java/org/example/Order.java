@@ -2,6 +2,8 @@ package org.example;
 
 import javax.swing.*;
 import java.math.BigDecimal;
+import java.time.LocalTime;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Order implements Comparable<Order>{
     private String id;
@@ -57,7 +59,19 @@ public class Order implements Comparable<Order>{
     public void setId(String id) {
         this.id = id;
     }
-
+    public static BigDecimal bidPrice(){
+        return new BigDecimal(ThreadLocalRandom.current().nextLong(32,38));
+    } public static BigDecimal askPrice(){
+        return new BigDecimal(ThreadLocalRandom.current().nextLong(26,32));
+    }
+    public static Order createNewOrder(Side side){
+        return new Order(
+                "uid" + ThreadLocalRandom.current().nextInt(0,100000),
+                Side.SELL.equals(side)? bidPrice().multiply(new BigDecimal(5)):askPrice().multiply(new BigDecimal(5)),
+                ThreadLocalRandom.current().nextInt(),
+                side,
+                LocalTime.now().getNano());
+    }
 
     @Override
     public int compareTo(Order o) {
