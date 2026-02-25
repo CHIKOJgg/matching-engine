@@ -56,6 +56,36 @@ public class OrderBook {
         for (BigDecimal price:listOfBids){
             System.out.printf("BIDS  | %5s | %d orders%n", price, bids.get(price).size());
         }
+        System.out.println("-------bids----------");
+    }
+    public void removeEmptyLevelBids(BigDecimal price) {
+            if (bids.get(price).isEmpty()){
+                bids.remove(price);
+                System.out.println("bid level remove succeed");
+            }
+            else {
+                System.out.println("bid level contains orders");
+            }
+    }
+    public void removeEmptyLevelAsks(BigDecimal price) {
+        if (asks.get(price).isEmpty()){
+            asks.remove(price);
+        }
+    }
+    public int getTotalQuantityAtLevel(BigDecimal price, Side side){
+      try {
+          if (side.equals(Side.BUY)){
+              return bids.get(price).stream()
+                      .mapToInt(Order::getQuantity).sum();
+
+          }
+          else {
+              return asks.get(price).stream().mapToInt(Order::getQuantity).sum();
+          }
+      }catch (NullPointerException e){
+          System.out.println("deque is empty");
+          return -1;
+      }
     }
     public Optional<BigDecimal> getBidAskSpread(){
        return Optional.ofNullable(getBestBid())

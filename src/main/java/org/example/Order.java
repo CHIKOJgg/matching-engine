@@ -68,7 +68,7 @@ public class Order implements Comparable<Order>{
         return new Order(
                 "uid" + ThreadLocalRandom.current().nextInt(0,100000),
                 Side.SELL.equals(side)? bidPrice().multiply(new BigDecimal(5)):askPrice().multiply(new BigDecimal(5)),
-                ThreadLocalRandom.current().nextInt(),
+                1,
                 side,
                 LocalTime.now().getNano());
     }
