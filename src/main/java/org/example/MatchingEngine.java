@@ -22,7 +22,7 @@ public class MatchingEngine {
         int remainingQ = order.getQuantity();
         System.out.println(order.getPrice() +" " + order.getQuantity() +" " + order.getTimestamp() +" " + order.getSideOfOrder());
         try {
-            TimeUnit.MILLISECONDS.sleep(3000);
+            TimeUnit.MILLISECONDS.sleep(1000);
         }catch (InterruptedException e){
             Thread.currentThread().interrupt();
         }
@@ -32,64 +32,83 @@ public class MatchingEngine {
 
             System.out.println(order.getPrice() + " trying to fill buy order ");
             Map.Entry<BigDecimal, ArrayDeque<Order>> bestAsk = book.getBestAsk();
-            if (bestAsk != null &&
-                    bestAsk.getKey().compareTo(order.getPrice()) <= 0) {
-                book.printBook();
-                while (remainingQ > 0) {
-                    ArrayDeque<Order> bestLevelAsk = book.getBestAsk().getValue();
+            while(remainingQ>0 && bestAsk!=null
+                    && bestAsk.getKey().compareTo(order.getPrice())<=0){
+                    ArrayDeque<Order> levelQueue = bestAsk.getValue();
                     if (bestAsk == null) break;
                     if (bestAsk.getKey().compareTo(order.getPrice()) > 0) break;
-                    ArrayDeque<Order> levelQueue = bestAsk.getValue();
-                    Order currOrder =  levelQueue.peekFirst();
-                    BigDecimal currOrderPrice =currOrder.getPrice();
-                    int executed = Math.min(currOrder.getQuantity(), remainingQ);
-                    remainingQ -= executed;
-                    currOrder.setQuantity(currOrder.getQuantity() - executed);
-                    System.out.println("Order matched" + currOrder.getId() + " with" + order.getId() + "with price" + currOrderPrice);
-                    bestLevelAsk.pollFirst();
-                    if (currOrder.getQuantity() == 0)
-                        levelQueue.pollFirst();
-                    if (bestLevelAsk.isEmpty()) {
-                        book.removeEmptyLevelAsks(currOrderPrice);
+                    if (levelQueue == null || levelQueue.isEmpty()) {
+                        book.removeEmptyLevelAsks(bestAsk.getKey());
+                        bestAsk = book.getBestAsk();
+                        continue;
                     }
-
-                }
-
-            } else {
+                    Order top = levelQueue.peekFirst();
+                    if(top ==null){
+                        book.removeEmptyLevelAsks(bestAsk.getKey());
+                        bestAsk = book.getBestAsk();
+                        continue;
+                    }
+                    int executed = Math.min(top.getQuantity(),remainingQ);
+                    remainingQ-=executed;
+                    top.setQuantity(top.getQuantity() -executed);
+                    System.out.println("Order matched" + top.getId() + " with" + order.getId() + "with price" + top.getPrice());
+                    if (top.getQuantity() == 0)
+                        levelQueue.pollFirst();
+                    if (levelQueue.isEmpty()) {
+                        book.removeEmptyLevelAsks(bestAsk.getKey());
+                    }
+                  bestAsk = book.getBestAsk();
+            }
+            if (remainingQ > 0) {
+                order.setQuantity(remainingQ);
                 book.addOrder(order);
-
             }
 
 
         }else {
+            System.out.println(order.getPrice() + " trying to fill sell order");
+
             Map.Entry<BigDecimal, ArrayDeque<Order>> bestBid = book.getBestBid();
-                System.out.println(order.getPrice() +" trying to fill");
-                if (bestBid != null&&book.getBestBid().getKey().compareTo(order.getPrice())<0){
-                    while (remainingQ>0){
+            // Для sell: пока есть лучший бид >= цена продажи
+            while (remainingQ > 0 && bestBid != null && bestBid.getKey().compareTo(order.getPrice()) >= 0) {
+                ArrayDeque<Order> levelQueue = bestBid.getValue();
+                if (levelQueue == null || levelQueue.isEmpty()) {
+                    book.removeEmptyLevelBids(bestBid.getKey());
                     bestBid = book.getBestBid();
-                        if (bestBid == null) break;
-                        if (bestBid.getKey().compareTo(order.getPrice()) > 0) break;
-                        ArrayDeque<Order> levelQueue = bestBid.getValue();
-                        Order currOrder =  levelQueue.peekFirst();
-                        BigDecimal currOrderPrice =currOrder.getPrice();
-
-                      int executed = Math.min(currOrder.getQuantity(), remainingQ);
-                        remainingQ -= executed;
-                        currOrder.setQuantity(currOrder.getQuantity() - executed);
-                        System.out.println("Order matched" + currOrder.getId() + " with" + order.getId() + "with price" + currOrderPrice);
-                        levelQueue.pollFirst();
-                        if (currOrder.getQuantity() == 0)
-                            levelQueue.pollFirst();
-                        if (levelQueue.isEmpty()) {
-                            book.removeEmptyLevelBids(currOrderPrice);
-                        }
-                    }
-                    book.printBook();
-                }else {
-                    book.addOrder(order);
-
+                    continue;
                 }
+
+                Order top = levelQueue.peekFirst();
+                if (top == null) {
+                    book.removeEmptyLevelBids(bestBid.getKey());
+                    bestBid = book.getBestBid();
+                    continue;
+                }
+
+                int executed = Math.min(top.getQuantity(), remainingQ);
+                remainingQ -= executed;
+                top.setQuantity(top.getQuantity() - executed);
+
+                System.out.println("Order matched " + top.getId() + " with " + order.getId() + " price " + top.getPrice());
+
+                if (top.getQuantity() == 0) {
+                    levelQueue.pollFirst();
+                }
+                if (levelQueue.isEmpty()) {
+                    book.removeEmptyLevelBids(bestBid.getKey());
+                }
+
+                bestBid = book.getBestBid();
+            }
+
+            if (remainingQ > 0) {
+                order.setQuantity(remainingQ);
+                book.addOrder(order);
+            }
         }
+
+        book.printBook();
+
 
 
     }

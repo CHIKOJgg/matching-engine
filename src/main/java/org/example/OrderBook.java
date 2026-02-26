@@ -5,12 +5,14 @@ import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.logging.Logger;
 
 public class OrderBook {
     TreeMap<BigDecimal, ArrayDeque<Order>> bids =new TreeMap<>(Comparator.reverseOrder());
     TreeMap<BigDecimal, ArrayDeque<Order>> asks =new TreeMap<>(Comparator.reverseOrder());
+    Map<String ,Order> orderIndex =new HashMap<>();
     void  addOrder(Order order){
-       ;
+       orderIndex.put(order.getId(), order);
        if (order.getSideOfOrder()==Side.SELL){
            asks.computeIfAbsent(order.getPrice(),
                    k->new ArrayDeque<>()).addLast(order);
@@ -20,7 +22,54 @@ public class OrderBook {
                    k ->new ArrayDeque<>()).addLast(order);
        }
     }
+    public void cancelOrder(String orderId){
 
+        Order order = orderIndex.remove(orderId);
+
+        if (order ==null){
+            return;
+        }
+        ArrayDeque<Order> level;
+        if (order.getSideOfOrder()==Side.BUY){
+          level = bids.get(order.getPrice());
+        }
+        else {
+          level = asks.get(order.getPrice());
+        }
+
+        if (order.getSideOfOrder() != null
+                &&
+            order.getSideOfOrder().equals(Side.BUY)
+                &&
+            level!=null)
+        {
+           boolean removed = level.removeIf(order1 -> {
+                System.out.println("order" + orderId + "successfully deleted");
+                return order1.getId().equals(orderId);
+            });
+            if (removed && level.isEmpty()){
+                bids.remove(order.getPrice());
+            }
+
+
+
+        }
+        else if (order.getSideOfOrder() != null
+                &&
+                order.getSideOfOrder().equals(Side.SELL)
+                &&
+                level!=null){
+
+          boolean removed =  level.removeIf(order1 -> {
+                System.out.println("order" + orderId + "successfully deleted");
+                return order1.getId().equals(orderId);
+            });
+            if(removed && level.isEmpty()){
+                asks.remove(order.getPrice());
+            }
+
+        }
+    }
     public Map.Entry<BigDecimal,ArrayDeque<Order>> getBestBid(){
         if (bids.isEmpty())return  null;
        return bids.firstEntry();
@@ -41,11 +90,11 @@ public class OrderBook {
         printBids();
     }
     private void printAsks(){
-        System.out.println("-------asks----------");
+        System.out.println("--------asks----------");
         var listOfAsks = new ArrayList<>(asks.keySet());
         listOfAsks.reversed();
          for (BigDecimal price:listOfAsks){
-             System.out.printf("ASK  | %5s | %d orders%n", price, asks.get(price).size());
+             System.out.printf("ASK  | %5s | %d orders%n ", price, asks.get(price).size());
          }
 
     }
@@ -54,12 +103,17 @@ public class OrderBook {
         var listOfBids = new ArrayList<>(bids.keySet());
         listOfBids.reversed();
         for (BigDecimal price:listOfBids){
-            System.out.printf("BIDS  | %5s | %d orders%n", price, bids.get(price).size());
+            System.out.printf("ASK  | %5s | %d orders%n ", price, bids.get(price).size());
         }
         System.out.println("-------bids----------");
     }
     public void removeEmptyLevelBids(BigDecimal price) {
-            if (bids.get(price).isEmpty()){
+       var bidsGet = bids.get(price);
+       if (bidsGet==null){
+           System.out.println("ArrayDeque<order> is void at price: " + price);
+           return;}
+
+            if (bidsGet.isEmpty()){
                 bids.remove(price);
                 System.out.println("bid level remove succeed");
             }

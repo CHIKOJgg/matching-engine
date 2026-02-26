@@ -11,6 +11,7 @@ public class Order implements Comparable<Order>{
     private int quantity;
     private Side sideOfOrder;
     private long timestamp;
+    int remainingQuantity;
 
     public Order(String id, BigDecimal price, int quantity, Side sideOfOrder, long timestamp) {
         this.id = id;
@@ -18,6 +19,11 @@ public class Order implements Comparable<Order>{
         this.quantity = quantity;
         this.sideOfOrder = sideOfOrder;
         this.timestamp = timestamp;
+        this.remainingQuantity =  quantity;
+    }
+
+    public void setRemainingQuantity(int remainingQuantity) {
+        this.remainingQuantity = remainingQuantity;
     }
 
     public long getTimestamp() {

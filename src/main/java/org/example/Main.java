@@ -17,18 +17,39 @@ public class Main {
         OrderBook orderBook = new OrderBook();
         System.out.println(orderBook.getBestBid());
         MatchingEngine matchingEngine = new MatchingEngine();
-        matchingEngine.book.addOrder(new Order("buy90",new BigDecimal(90),1,Side.BUY,1));
-        matchingEngine.book.addOrder(new Order("buy90",new BigDecimal(90),1,Side.BUY,1));
-        matchingEngine.placeLimitOrder(new Order("sell90",new BigDecimal(90),2,Side.SELL,1));
-        matchingEngine.placeLimitOrder(new Order("buy100",new BigDecimal(100),1,Side.BUY,1));
-        matchingEngine.placeLimitOrder(new Order("sell10",new BigDecimal(10),1,Side.SELL,1));
-        matchingEngine.placeLimitOrder(new Order("sell101",new BigDecimal(101),1,Side.SELL,1));
-        matchingEngine.placeLimitOrder(new Order("sell102",new BigDecimal(102),1,Side.SELL,1));
-        matchingEngine.placeLimitOrder(new Order("sell105",new BigDecimal(105),1,Side.SELL,1));
-        matchingEngine.placeLimitOrder(new Order("sell89",new BigDecimal(89),1,Side.SELL,1));
-        matchingEngine.placeLimitOrder(new Order("buy100",new BigDecimal(100),1,Side.BUY,1));
-        matchingEngine.placeLimitOrder(new Order("buy100",new BigDecimal(100),1,Side.BUY,1));
+       // matchingEngine.placeLimitOrder(new Order("A",new BigDecimal(100),3,Side.SELL,1));
+        matchingEngine.placeLimitOrder(new Order("B",new BigDecimal(100),3,Side.SELL,1));
+        matchingEngine.book.cancelOrder("B");
         matchingEngine.book.printBook();
+        matchingEngine.placeLimitOrder(new Order("C",new BigDecimal(100),3,Side.BUY,1));
+        matchingEngine.placeLimitOrder(new Order("C",new BigDecimal(110),3,Side.BUY,1));
+        matchingEngine.placeLimitOrder(new Order("C1",new BigDecimal(1125),3,Side.BUY,1));
+        matchingEngine.book.cancelOrder("C");
+        matchingEngine.placeLimitOrder(new Order("B",new BigDecimal(1125),3,Side.SELL,1));
+        matchingEngine.placeLimitOrder(new Order("B",new BigDecimal(1125),3,Side.BUY,1));
+       // var f = matchingEngine.book.getBestAsk().getValue();
+        //System.out.println(f.getFirst().getQuantity());
+//        matchingEngine.placeLimitOrder(new Order("sell90",new BigDecimal(90),10,Side.BUY,1));
+//        matchingEngine.placeLimitOrder(new Order("sell90",new BigDecimal(90),10,Side.SELL,1));
+//        matchingEngine.placeLimitOrder(new Order("sell91",new BigDecimal(91),10,Side.SELL,1));
+//        matchingEngine.placeLimitOrder(new Order("sell91",new BigDecimal(91),10,Side.BUY,1));
+//        matchingEngine.placeLimitOrder(new Order("sell91",new BigDecimal(91),10,Side.BUY,1));
+//        matchingEngine.placeLimitOrder(new Order("sell91",new BigDecimal(91),10,Side.BUY,1));
+//        matchingEngine.placeLimitOrder(new Order("sell91",new BigDecimal(91),10,Side.BUY,1));
+//        matchingEngine.placeLimitOrder(new Order("sell91",new BigDecimal(273),10,Side.SELL,1));
+//        matchingEngine.placeLimitOrder(new Order("sell91",new BigDecimal(91),30,Side.SELL,1));
+
+      //  matchingEngine.placeLimitOrder(new Order("sell90",new BigDecimal(90),15,Side.SELL,1));
+//        matchingEngine.placeLimitOrder(new Order("sell90",new BigDecimal(90),2,Side.SELL,1));
+//matchingEngine.placeLimitOrder(new Order("buy100",new BigDecimal(100),10,Side.BUY,1));
+//        matchingEngine.placeLimitOrder(new Order("sell10",new BigDecimal(10),1,Side.SELL,1));
+//        matchingEngine.placeLimitOrder(new Order("sell101",new BigDecimal(101),1,Side.SELL,1));
+//        matchingEngine.placeLimitOrder(new Order("sell102",new BigDecimal(102),1,Side.SELL,1));
+//        matchingEngine.placeLimitOrder(new Order("sell105",new BigDecimal(105),1,Side.SELL,1));
+//        matchingEngine.placeLimitOrder(new Order("sell89",new BigDecimal(89),1,Side.SELL,1));
+//        matchingEngine.placeLimitOrder(new Order("buy100",new BigDecimal(100),1,Side.BUY,1));
+//        matchingEngine.placeLimitOrder(new Order("buy100",new BigDecimal(100),1,Side.BUY,1));
+        //matchingEngine.book.printBook();
 //        IntStream.rangeClosed(0,50)
 //                .forEach(i->{
 //                    Order newOrder =
@@ -59,53 +80,53 @@ public class Main {
 
 
 
-
-
-        ArrayDeque<Order> arrayDeque = new ArrayDeque<>();
-        Order orderB =  new Order("B",new BigDecimal(100),1,Side.BUY,2);
-        arrayDeque.addLast(new Order("A",new BigDecimal(100),1,Side.BUY,1));
-        arrayDeque.addLast(orderB);
-        arrayDeque.addLast(new Order("C",new BigDecimal(100),1,Side.BUY,3));
-        arrayDeque.remove(orderB);
-        System.out.println(arrayDeque.pollFirst().getId());
-        System.out.println(arrayDeque.pollFirst().getId());
-
-
-        orderBook.addOrder(new Order("A",new BigDecimal(100),1,Side.BUY,1));
-        orderBook.addOrder(new Order("B",new BigDecimal(100),1,Side.BUY,1));
-        orderBook.addOrder(new Order("C",new BigDecimal(100),1,Side.BUY,1));
-//        orderBook.bids.get(new BigDecimal(100)).stream().forEach(i-> {
-//            if (i.getId().equals("B")) {
-//                orderBook.bids.get(new BigDecimal(100)).remove(i);
 //
-//            }
-//        });
-        orderBook.removeEmptyLevelBids(new BigDecimal(100));
-        System.out.println(orderBook.bids.get(new BigDecimal(100)).peekFirst().getId());
-        orderBook.bids.get(new BigDecimal(100)).pollFirst();
-        System.out.println(orderBook.getTotalQuantityAtLevel(new BigDecimal(100), Side.BUY)+ "----");
-        orderBook.removeEmptyLevelBids(new BigDecimal(100));
-        System.out.println(orderBook.bids.get(new BigDecimal(100)).peekFirst().getId());
-        orderBook.bids.get(new BigDecimal(100)).pollFirst();
-        orderBook.removeEmptyLevelBids(new BigDecimal(100));
-        System.out.println(orderBook.bids.get(new BigDecimal(100)).peekFirst().getId());
-        orderBook.bids.get(new BigDecimal(100)).pollFirst();
-        orderBook.removeEmptyLevelBids(new BigDecimal(100));
-
-
-        System.out.println(orderBook.bids);
-        System.out.println(orderBook.asks);
-        Map.Entry<BigDecimal, ArrayDeque<Order>> bestAsk = matchingEngine.book.getBestAsk();
-        Map.Entry<BigDecimal, ArrayDeque<Order>> bestBid = matchingEngine.book.getBestBid();
-        if (bestBid!=null)  System.out.println(matchingEngine.book.getBestBid().getKey()+"best bid");
-        if (bestAsk!=null)  System.out.println(matchingEngine.book.getBestAsk().getKey() +"best ask");
-
-
-        orderBook.printBook();
-        System.out.println(matchingEngine.book.getBidAskSpread());
-
-
-
+//
+//        ArrayDeque<Order> arrayDeque = new ArrayDeque<>();
+//        Order orderB =  new Order("B",new BigDecimal(100),1,Side.BUY,2);
+//        arrayDeque.addLast(new Order("A",new BigDecimal(100),1,Side.BUY,1));
+//        arrayDeque.addLast(orderB);
+//        arrayDeque.addLast(new Order("C",new BigDecimal(100),1,Side.BUY,3));
+//        arrayDeque.remove(orderB);
+//        System.out.println(arrayDeque.pollFirst().getId());
+//        System.out.println(arrayDeque.pollFirst().getId());
+//
+//
+//        orderBook.addOrder(new Order("A",new BigDecimal(100),1,Side.BUY,1));
+//        orderBook.addOrder(new Order("B",new BigDecimal(100),1,Side.BUY,1));
+//        orderBook.addOrder(new Order("C",new BigDecimal(100),1,Side.BUY,1));
+////        orderBook.bids.get(new BigDecimal(100)).stream().forEach(i-> {
+////            if (i.getId().equals("B")) {
+////                orderBook.bids.get(new BigDecimal(100)).remove(i);
+////
+////            }
+////        });
+//        orderBook.removeEmptyLevelBids(new BigDecimal(100));
+//        System.out.println(orderBook.bids.get(new BigDecimal(100)).peekFirst().getId());
+//        orderBook.bids.get(new BigDecimal(100)).pollFirst();
+//        System.out.println(orderBook.getTotalQuantityAtLevel(new BigDecimal(100), Side.BUY)+ "----");
+//        orderBook.removeEmptyLevelBids(new BigDecimal(100));
+//        System.out.println(orderBook.bids.get(new BigDecimal(100)).peekFirst().getId());
+//        orderBook.bids.get(new BigDecimal(100)).pollFirst();
+//        orderBook.removeEmptyLevelBids(new BigDecimal(100));
+//        System.out.println(orderBook.bids.get(new BigDecimal(100)).peekFirst().getId());
+//        orderBook.bids.get(new BigDecimal(100)).pollFirst();
+//        orderBook.removeEmptyLevelBids(new BigDecimal(100));
+//
+//
+//        System.out.println(orderBook.bids);
+//        System.out.println(orderBook.asks);
+//        Map.Entry<BigDecimal, ArrayDeque<Order>> bestAsk = matchingEngine.book.getBestAsk();
+//        Map.Entry<BigDecimal, ArrayDeque<Order>> bestBid = matchingEngine.book.getBestBid();
+//        if (bestBid!=null)  System.out.println(matchingEngine.book.getBestBid().getKey()+"best bid");
+//        if (bestAsk!=null)  System.out.println(matchingEngine.book.getBestAsk().getKey() +"best ask");
+//
+//
+//        orderBook.printBook();
+//        System.out.println(matchingEngine.book.getBidAskSpread());
+//
+//
+//
 
 
 
