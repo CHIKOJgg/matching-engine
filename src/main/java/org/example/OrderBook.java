@@ -44,7 +44,7 @@ public class OrderBook {
             level!=null)
         {
            boolean removed = level.removeIf(order1 -> {
-                System.out.println("order" + orderId + "successfully deleted");
+                System.out.println("order" + orderId + "successfully deleted order");
                 return order1.getId().equals(orderId);
             });
             if (removed && level.isEmpty()){
