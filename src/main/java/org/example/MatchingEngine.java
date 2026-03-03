@@ -67,9 +67,7 @@ public class MatchingEngine {
 
         }else {
             System.out.println(order.getPrice() + " trying to fill sell order");
-
             Map.Entry<BigDecimal, ArrayDeque<Order>> bestBid = book.getBestBid();
-            // Для sell: пока есть лучший бид >= цена продажи
             while (remainingQ > 0 && bestBid != null && bestBid.getKey().compareTo(order.getPrice()) >= 0) {
                 ArrayDeque<Order> levelQueue = bestBid.getValue();
                 if (levelQueue == null || levelQueue.isEmpty()) {

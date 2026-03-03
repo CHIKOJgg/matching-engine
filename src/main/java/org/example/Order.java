@@ -67,9 +67,12 @@ public class Order implements Comparable<Order>{
     }
     public static BigDecimal bidPrice(){
         return new BigDecimal(ThreadLocalRandom.current().nextLong(32,38));
-    } public static BigDecimal askPrice(){
+    }
+
+    public static BigDecimal askPrice(){
         return new BigDecimal(ThreadLocalRandom.current().nextLong(26,32));
     }
+
     public static Order createNewOrder(Side side){
         return new Order(
                 "uid" + ThreadLocalRandom.current().nextInt(0,100000),

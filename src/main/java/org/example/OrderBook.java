@@ -71,7 +71,7 @@ public class OrderBook {
         }
     }
     public Map.Entry<BigDecimal,ArrayDeque<Order>> getBestBid(){
-        if (bids.isEmpty())return  null;
+        if (bids.isEmpty())return null;
        return bids.firstEntry();
     }
     public Map.Entry<BigDecimal, ArrayDeque<Order>> getBestAsk(){
