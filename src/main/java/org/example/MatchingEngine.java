@@ -11,8 +11,11 @@ import java.util.concurrent.TimeUnit;
 
 public class MatchingEngine {
     OrderBook book;
-    MatchingEngine(){
+    OrderBookDao orderBookDao;
+    public MatchingEngine(){
          this.book = new OrderBook();
+         this.orderBookDao = new OrderBookDao();
+
     }
 
  //while (!book.asks.isEmpty() && book.getBestAsk().getKey().compareTo(order.getPrice()) <= 0)

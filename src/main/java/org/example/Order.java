@@ -2,6 +2,7 @@ package org.example;
 
 import javax.swing.*;
 import java.math.BigDecimal;
+import java.security.PublicKey;
 import java.time.LocalTime;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -19,6 +20,14 @@ public class Order implements Comparable<Order>{
         this.quantity = quantity;
         this.sideOfOrder = sideOfOrder;
         this.timestamp = timestamp;
+        this.remainingQuantity =  quantity;
+    }
+    public Order() {
+        this.id = "templateID";
+        this.price = new BigDecimal(123);
+        this.quantity = 1;
+        this.sideOfOrder = Side.BUY;
+        this.timestamp = 123;
         this.remainingQuantity =  quantity;
     }
 
