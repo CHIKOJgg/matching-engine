@@ -11,14 +11,14 @@ import java.util.concurrent.TimeUnit;
 
 public class MatchingEngine {
     OrderBook book;
-    OrderBookDao orderBookDao;
     public MatchingEngine(){
          this.book = new OrderBook();
-         this.orderBookDao = new OrderBookDao();
-
     }
 
- //while (!book.asks.isEmpty() && book.getBestAsk().getKey().compareTo(order.getPrice()) <= 0)
+    public OrderBook getBook() {
+        return book;
+    }
+    //while (!book.asks.isEmpty() && book.getBestAsk().getKey().compareTo(order.getPrice()) <= 0)
 
     public void placeLimitOrder(Order order){
         Side newOrderSide = order.getSideOfOrder();
@@ -109,8 +109,5 @@ public class MatchingEngine {
         }
 
         book.printBook();
-
-
-
     }
 }

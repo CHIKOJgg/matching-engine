@@ -30,6 +30,14 @@ public class Order implements Comparable<Order>{
         this.timestamp = 123;
         this.remainingQuantity =  quantity;
     }
+    public Order(Side side) {
+        this.id = "templateID";
+        this.price = new BigDecimal(123);
+        this.quantity = 1;
+        this.sideOfOrder = side;
+        this.timestamp = 123;
+        this.remainingQuantity =  quantity;
+    }
 
     public void setRemainingQuantity(int remainingQuantity) {
         this.remainingQuantity = remainingQuantity;

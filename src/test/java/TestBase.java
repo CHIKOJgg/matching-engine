@@ -7,10 +7,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith({
-        GlobalExtension.class,
-        PostProcesstingExtension.class,
-        CondtionExtension.class,
-        ThrowableExtension.class,
         MockitoExtension.class
 })
 public  abstract class TestBase {
