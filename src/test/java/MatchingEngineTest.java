@@ -1,6 +1,5 @@
 import org.example.MatchingEngine;
 import org.example.Order;
-import org.example.OrderBookDao;
 import org.example.Side;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +16,8 @@ public class MatchingEngineTest {
     private ArgumentCaptor<Integer> argumentCaptor;
    // @Mock//куда вставляем
     private  MatchingEngine matchingEngine;
+
+
     @BeforeEach
     public void setUp(){
         this.matchingEngine = new MatchingEngine();
@@ -44,5 +45,54 @@ public class MatchingEngineTest {
             Assertions.assertFalse(matchingEngine.getBook().getBestAsk().getValue().isEmpty());
         }
     }
+    @Test
+    public void nullCasesBookGetting(){
+        Assertions.assertAll(
+        ()-> Assertions.assertNull(matchingEngine.getBook().getBestBid()),
+        ()-> Assertions.assertNull(matchingEngine.getBook().getBestAsk())
+        );
+    }
+    @Test
+    public void matchingOfOrders(){
+        //
+        matchingEngine.placeLimitOrder(new Order(Side.BUY));
+        matchingEngine.placeLimitOrder(new Order(Side.SELL));
 
+        var isEmptyBids = matchingEngine.getBook().getBestBid();
+        var isEmptyAsks = matchingEngine.getBook().getBestAsk();
+        org.assertj.core.api.Assertions.assertThat(isEmptyAsks).isEqualTo(null);
+        org.assertj.core.api.Assertions.assertThat(isEmptyBids).isEqualTo(null);
+
+    }
+    public static Stream<Arguments> supplyOrders() {
+        return Stream.of(
+                Arguments.of(new Order(Side.BUY, 10), new Order(Side.SELL, 5)),
+                Arguments.of(new Order(Side.BUY, 10), new Order(Side.SELL, 5)),
+                Arguments.of(new Order(Side.BUY, 10), new Order(Side.SELL, 5)),
+                Arguments.of(new Order(Side.BUY, 5), new Order(Side.SELL, 6)),
+                Arguments.of(new Order(Side.BUY, 5), new Order(Side.SELL, 6)),
+                Arguments.of(new Order(Side.BUY, 5), new Order(Side.SELL, 6))
+        );
+    }
+    @ParameterizedTest
+    @MethodSource("supplyOrders")
+    public void partialFillingMatchingOfOrders(Order orderBuy, Order orderSell){
+        //
+        matchingEngine.placeLimitOrder(orderBuy);
+        matchingEngine.placeLimitOrder(orderSell);
+        if (!matchingEngine.getBook().getBestAsk().getValue().isEmpty()){
+           int q = matchingEngine.getBook().getBestAsk().getValue().getFirst().getQuantity();
+           int testQuantity = orderSell.getQuantity() - orderBuy.getQuantity();
+           Assertions.assertEquals(testQuantity, q, "order bid partially filled");
+        }
+
+        else if (!matchingEngine.getBook().getBestBid().getValue().isEmpty()) {
+            int q = matchingEngine.getBook().getBestBid().getValue().getFirst().getQuantity();
+            int testQuantity = orderBuy.getQuantity() - orderSell.getQuantity();
+            Assertions.assertEquals(testQuantity, q,"order ask partially filled");
+        }
+        else {
+           Assertions.fail();
+        }
+    }
 }

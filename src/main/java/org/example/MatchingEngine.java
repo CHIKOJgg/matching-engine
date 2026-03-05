@@ -24,11 +24,7 @@ public class MatchingEngine {
         Side newOrderSide = order.getSideOfOrder();
         int remainingQ = order.getQuantity();
         System.out.println(order.getPrice() +" " + order.getQuantity() +" " + order.getTimestamp() +" " + order.getSideOfOrder());
-        try {
-            TimeUnit.MILLISECONDS.sleep(1000);
-        }catch (InterruptedException e){
-            Thread.currentThread().interrupt();
-        }
+
 
         if (newOrderSide.equals(Side.BUY)){
 
