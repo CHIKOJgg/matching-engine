@@ -27,8 +27,6 @@ public class MatchingEngine {
 
 
         if (newOrderSide.equals(Side.BUY)){
-
-
             System.out.println(order.getPrice() + " trying to fill buy order ");
             Map.Entry<BigDecimal, ArrayDeque<Order>> bestAsk = book.getBestAsk();
             while(remainingQ>0 && bestAsk!=null

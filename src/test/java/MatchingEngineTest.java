@@ -8,7 +8,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.*;
-import org.mockito.internal.matchers.Or;
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class MatchingEngineTest {
@@ -16,6 +18,14 @@ public class MatchingEngineTest {
     private ArgumentCaptor<Integer> argumentCaptor;
    // @Mock//куда вставляем
     private  MatchingEngine matchingEngine;
+
+    public static Stream<Arguments> supplyOrdersVarargs() {
+        return Stream.of(
+                Arguments.of((Object) new Order[]{new Order(new BigDecimal(10), Side.SELL), new Order(new BigDecimal(9), Side.BUY)}),
+                Arguments.of((Object) new Order[]{new Order(new BigDecimal(1), Side.SELL), new Order(new BigDecimal(0), Side.BUY)}),
+                Arguments.of((Object) new Order[]{new Order(new BigDecimal("100.10"), Side.SELL), new Order(new BigDecimal("100.099"), Side.BUY)})
+        );
+    }
 
 
     @BeforeEach
@@ -96,5 +106,45 @@ public class MatchingEngineTest {
         else {
            Assertions.fail();
         }
+    }
+    @Test
+    public void fifoOrderExecution() throws InterruptedException {
+
+        Order orderBuy5a = new Order("buy5a", new BigDecimal(100), 5, Side.BUY, 1);
+        Order orderBuy5b = new Order("buy5b", new BigDecimal(100), 5, Side.BUY, 2);
+        Order orderBuy5c = new Order("buy5c", new BigDecimal(100), 5, Side.BUY, 3);
+        Order orderSell7 = new Order("sell7", new BigDecimal(100), 7, Side.SELL, 4);
+
+        matchingEngine.placeLimitOrder(orderBuy5a);
+        matchingEngine.placeLimitOrder(orderBuy5b);
+        matchingEngine.placeLimitOrder(orderBuy5c);
+        matchingEngine.placeLimitOrder(orderSell7);
+
+        Assertions.assertEquals(0, orderBuy5a.getQuantity());
+        Assertions.assertEquals(3, matchingEngine.getBook().getBestBid().getValue().pollFirst().getQuantity());
+        Assertions.assertEquals(5, matchingEngine.getBook().getBestBid().getValue().pollFirst().getQuantity());
+
+
+
+    }
+    @ParameterizedTest
+    @MethodSource("supplyOrdersVarargs")
+    public void noCrossWhenPricesDontMatch(Order... orders){
+        List<Order> list = Arrays.stream(orders).toList();
+        for (Order order : orders) {
+        matchingEngine.placeLimitOrder(order);
+        }
+        Assertions.assertAll(
+                ()-> org.assertj.core.api.Assertions
+                .assertThat(matchingEngine.getBook()
+                .getBestAsk().getValue().getFirst())
+                .isEqualTo(list.get(0)),
+                ()-> org.assertj.core.api.Assertions
+                .assertThat(matchingEngine.getBook()
+                .getBestBid().getValue().getFirst())
+                .isEqualTo(list.get(1))
+
+        );
+
     }
 }
