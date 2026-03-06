@@ -44,6 +44,13 @@ public class Order implements Comparable<Order>{
         this.sideOfOrder = side;
         this.timestamp = 123;
         this.remainingQuantity =  this.quantity;
+    }public Order(BigDecimal price, Side side) {
+        this.id = "templateID";
+        this.price =price;
+        this.quantity = 1;
+        this.sideOfOrder = side;
+        this.timestamp = 123;
+        this.remainingQuantity =  this.quantity;
     }
 
     public void setRemainingQuantity(int remainingQuantity) {
@@ -96,7 +103,7 @@ public class Order implements Comparable<Order>{
     public static BigDecimal askPrice(){
         return new BigDecimal(ThreadLocalRandom.current().nextLong(26,32));
     }
-
+//TODO rebuild with constructors
     public static Order createNewOrder(Side side){
         return new Order(
                 "uid" + ThreadLocalRandom.current().nextInt(0,100000),

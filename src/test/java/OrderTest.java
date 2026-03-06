@@ -69,9 +69,6 @@ public static Stream<Arguments> supplyTestDataForNewOrder() {
     @ParameterizedTest
     @MethodSource("supplyTestDataForNewOrder")
     public void testOrdersComparison (Order order) throws IOException {
-        if (true) {
-            throw new RuntimeException();
-        }
         Order orderComparable = new Order("idofOrder", new BigDecimal(1), 1, Side.SELL, 245);
         int orderCompResult = orderComparable.compareTo(order);
         Assertions.assertEquals(1 , orderCompResult);
@@ -89,7 +86,13 @@ public static Stream<Arguments> supplyTestDataForNewOrder() {
         testOrderBuy.setTimestamp(123);
         Assertions.assertEquals(123, testOrderBuy.getTimestamp());
     }
-
+    @Test
+    public void bidPriceTestShouldReturnFrom32to38(){
+        org.assertj.core.api.Assertions.assertThat(Order.bidPrice()).isBetween(new BigDecimal(32),new BigDecimal(38));
+    } @Test
+    public void askPriceTestShouldReturnFrom26to32(){
+        org.assertj.core.api.Assertions.assertThat(Order.askPrice()).isBetween(new BigDecimal(26),new BigDecimal(32));
+    }
     @Test
     void setTimestamp() {
 
