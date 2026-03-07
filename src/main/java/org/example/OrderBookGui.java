@@ -1,5 +1,4 @@
 package org.example;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -21,24 +20,95 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class OrderBookGui extends Application{
     private MatchingEngine matchingEngine;
-    private TextArea textArea;
 
+    private TableView<BookRow> bidsTable = new TableView<>();
+    private TableView<BookRow> asksTable = new TableView<>();
 
 
     public static void main(String[] args) {
         launch(args);
     }
+    private void startUpdating() {
+        AnimationTimer timer = new AnimationTimer() {
+            private long lastUpdate = 0;
+        @Override
+        public void handle(long now) {
+            if (now - lastUpdate>1_000_000){
+                updateTables();
+                lastUpdate = now;
+            }
+        }
+    };
+        timer.start();
+    }
+
+    private void updateTables() {
+
+        List<BookRow> bids = new ArrayList<>();
+        List<BookRow> asks = new ArrayList<>();
+
+        synchronized (matchingEngine.book) {
+
+            matchingEngine.book.bids.forEach((price, queue) -> {
+
+                int volume = queue.stream()
+                        .mapToInt(o -> o.getQuantity())
+                        .sum();
+
+                bids.add(new BookRow(
+                        price.toString(),
+                        String.valueOf(volume),
+                        String.valueOf(queue.size())
+                ));
+            });
+
+            matchingEngine.book.asks.forEach((price, queue) -> {
+
+                int volume = queue.stream()
+                        .mapToInt(o -> o.getQuantity())
+                        .sum();
+
+                asks.add(new BookRow(
+                        price.toString(),
+                        String.valueOf(volume),
+                        String.valueOf(queue.size())
+                ));
+            });
+        }
+
+        Platform.runLater(() -> {
+
+            bidsTable.getItems().setAll(bids);
+            asksTable.getItems().setAll(asks);
+
+        });
+    }
     @Override
     public void start(Stage stage) throws Exception {
 
         matchingEngine = new MatchingEngine();
-        textArea = new TextArea();
-        textArea.setEditable(false);
+        configureTable(bidsTable);
+        configureTable(asksTable);
+        Label bidsLabel= new Label("BIDS");
+        Label asksLabel= new Label("ASKS");
+        bidsLabel.setStyle("-fx-text-fill:#2ecc71; -fx-font-size:16px;");
+        asksLabel.setStyle("-fx-text-fill:#e74c3c; -fx-font-size:16px;");
+        VBox bidsBox= new VBox(5, bidsLabel,bidsTable);
+        VBox asksBox = new VBox(5, asksLabel,asksTable);
+        VBox tables = new VBox(10, asksBox, bidsBox);
+        tables.setPadding(new Insets(10));
+        Scene scene= new Scene(tables, 600,600);
+        VBox.setVgrow(bidsTable, Priority.ALWAYS);
+        VBox.setVgrow(asksTable, Priority.ALWAYS);
+        // configureTable();
 
-        textArea.setFont(javafx.scene.text.Font.font("Monospaced", 14));
-        textArea.setStyle("-fx-control-inner-background: #1a1a1a; -fx-text-fill: white;");
-        VBox root = new VBox(textArea);
-        Scene scene = new Scene(root, 500, 600);
+      //  textArea = new TextArea();
+        //  textArea.setEditable(false);
+//
+//        textArea.setFont(javafx.scene.text.Font.font("Monospaced", 14));
+//        textArea.setStyle("-fx-control-inner-background: #1a1a1a; -fx-text-fill: white;");
+//        VBox root = new VBox(textArea);
+//        Scene scene = new Scene(root, 500, 600);
         stage.setTitle("OrderBook");
         stage.setScene(scene);
         stage.show();
@@ -50,50 +120,15 @@ public class OrderBookGui extends Application{
         engineThread.start();
 
     }
-
-    private void startUpdating() {
-        AnimationTimer timer = new AnimationTimer() {
-            private long lastUpdate = 0;
-        @Override
-        public void handle(long now) {
-            if (now - lastUpdate>150_000_000){
-                String booktext = matchingEngine.book.printBook();
-                textArea.setText(booktext);
-                lastUpdate = now;
-            }
-        }
-    };
-        timer.start();
+    private void configureTable(TableView<BookRow> table) {
+        TableColumn<BookRow,String> price = new TableColumn<>("Price");
+        price.setCellValueFactory(c->new SimpleStringProperty(c.getValue().getPrice()));
+        TableColumn<BookRow,String> volume = new TableColumn<>("Volume");
+        volume.setCellValueFactory(c->new SimpleStringProperty(c.getValue().getVolume()));
+        TableColumn<BookRow,String> orders = new TableColumn<>("Orders");
+        orders.setCellValueFactory(c->new SimpleStringProperty(c.getValue().getOrders()));
+        table.getColumns().addAll(price,volume,orders);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
     }
-
-    private HBox createTopPanel() {
-        HBox topPanel  = new HBox(20);
-        topPanel.setPadding(new Insets(15));
-        return topPanel;
-    }
-    private Node createOrderBookPanel(
-    ) {
-            GridPane gridPane = new GridPane();
-            gridPane.setPadding(new Insets(15));
-            Label bidsHeader = new Label("BID");
-            Label asksHeader = new Label("ASK");
-            Label priceHeader = new Label("PRICE");
-
-            gridPane.add(bidsHeader, 0, 0, 2, 1);
-            gridPane.add(asksHeader, 2, 0, 2, 1);
-
-            var bidsContainer = new VBox(2);
-            var asksContainer = new VBox(2);
-            gridPane.add(bidsContainer,0,2,2,1);
-            gridPane.add(asksContainer,2,2,2,1);
-            return gridPane;
-
-    }
-    private HBox createBottomPanel() {
-        HBox bottomPanel = new HBox(15);
-        bottomPanel.setPadding(new Insets(10));
-        return bottomPanel;
-    }
-
 
 }

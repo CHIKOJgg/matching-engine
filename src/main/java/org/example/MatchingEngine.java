@@ -24,7 +24,7 @@ public class MatchingEngine {
 
     public void placeLimitOrder(Order order){
         try {
-            TimeUnit.MILLISECONDS.sleep(30);
+            TimeUnit.MILLISECONDS.sleep(3);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -106,9 +106,9 @@ public class MatchingEngine {
     }
     public void runEngine(){
         ArrayList<Order> orders = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 100000; i++) {
             orders.add(new Order(
-                    new BigDecimal(ThreadLocalRandom.current().nextInt(15,20)),
+                    new BigDecimal(ThreadLocalRandom.current().nextInt(15,25)),
                     ThreadLocalRandom.current().nextBoolean()?Side.BUY:Side.SELL,
                     ThreadLocalRandom.current().nextInt(10,100)
             ));
