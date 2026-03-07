@@ -11,7 +11,7 @@ public class OrderBook {
     TreeMap<BigDecimal, ArrayDeque<Order>> bids =new TreeMap<>(Comparator.reverseOrder());
     TreeMap<BigDecimal, ArrayDeque<Order>> asks =new TreeMap<>(Comparator.reverseOrder());
     Map<String ,Order> orderIndex =new HashMap<>();
-    void  addOrder(Order order){
+    synchronized void addOrder(Order order){
        orderIndex.put(order.getId(), order);
        if (order.getSideOfOrder()==Side.SELL){
            asks.computeIfAbsent(order.getPrice(),
@@ -70,11 +70,11 @@ public class OrderBook {
 
         }
     }
-    public Map.Entry<BigDecimal,ArrayDeque<Order>> getBestBid(){
+    public synchronized  Map.Entry<BigDecimal,ArrayDeque<Order>>  getBestBid(){
         if (bids.isEmpty())return null;
        return bids.firstEntry();
     }
-    public Map.Entry<BigDecimal, ArrayDeque<Order>> getBestAsk(){
+    public synchronized  Map.Entry<BigDecimal, ArrayDeque<Order>> getBestAsk(){
         if (asks.isEmpty())return null;
         return asks.lastEntry();
     }
@@ -84,30 +84,38 @@ public class OrderBook {
 //    void cancelOrder(String id){
 //        ordersMap.remove(id);
 //    }
-    public void printBook(){
-        printAsks();
-        System.out.println("----------------");
-        printBids();
+    public  synchronized  String printBook(){
+       StringBuilder sbFinal = new StringBuilder();
+       StringBuilder sbAsks = printAsks();
+       StringBuilder sbBids = printBids();
+       sbFinal.append(sbAsks);
+       sbFinal.append("----------------").append("\n");;
+       sbFinal.append(sbBids);
+       return sbFinal.toString();
     }
-    private void printAsks(){
-        System.out.println("--------asks----------");
+    private StringBuilder printAsks(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("--------asks----------").append("\n");
         var listOfAsks = new ArrayList<>(asks.keySet());
         listOfAsks.reversed();
          for (BigDecimal price:listOfAsks){
-             System.out.printf("ASK  | %5s | %d orders%n ", price, asks.get(price).size());
+             sb.append("ASK  | ").append(price).append(" |").append(asks.get(price).size()).append(" orders").append("\n");
          }
+         return sb;
 
     }
-    private void printBids(){
+    private StringBuilder printBids(){
+        StringBuilder sb =new StringBuilder();
 
         var listOfBids = new ArrayList<>(bids.keySet());
         listOfBids.reversed();
         for (BigDecimal price:listOfBids){
-            System.out.printf("ASK  | %5s | %d orders%n ", price, bids.get(price).size());
+            sb.append("BIDS  | ").append(price).append(" |").append( bids.get(price).size()).append(" orders").append("\n");
         }
         System.out.println("-------bids----------");
+        return sb;
     }
-    public void removeEmptyLevelBids(BigDecimal price) {
+    public synchronized  void removeEmptyLevelBids(BigDecimal price) {
        var bidsGet = bids.get(price);
        if (bidsGet==null){
            System.out.println("ArrayDeque<order> is void at price: " + price);
@@ -121,7 +129,7 @@ public class OrderBook {
                 System.out.println("bid level contains orders");
             }
     }
-    public void removeEmptyLevelAsks(BigDecimal price) {
+    public synchronized  void removeEmptyLevelAsks(BigDecimal price) {
         if (asks.get(price).isEmpty()){
             asks.remove(price);
         }
