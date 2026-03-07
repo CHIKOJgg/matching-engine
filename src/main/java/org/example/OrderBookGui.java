@@ -1,3 +1,5 @@
+package org.example;
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -12,38 +14,57 @@ import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.*;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ThreadLocalRandom;
 
-public class OrderBookGui extends Application {
-    public void runMatchingEngine(){
-        
+public class OrderBookGui extends Application{
+    private MatchingEngine matchingEngine;
+    private TextArea textArea;
+
+
+
+    public static void main(String[] args) {
+        launch(args);
     }
     @Override
     public void start(Stage stage) throws Exception {
-        BorderPane root = new BorderPane();
-        root.setStyle("-fx-background-color: #1a1a1a;");
-        root.setTop(createTopPanel());
-        root.setCenter(createOrderBookPanel());
-        root.setBottom(createBottomPanel());
-        Scene scene = new Scene(root, 500, 800);
-        stage.setTitle("Matching engine");
+
+        matchingEngine = new MatchingEngine();
+        textArea = new TextArea();
+        textArea.setEditable(false);
+
+        textArea.setFont(javafx.scene.text.Font.font("Monospaced", 14));
+        textArea.setStyle("-fx-control-inner-background: #1a1a1a; -fx-text-fill: white;");
+        VBox root = new VBox(textArea);
+        Scene scene = new Scene(root, 500, 600);
+        stage.setTitle("OrderBook");
         stage.setScene(scene);
         stage.show();
-        
-        runMatchingEngine();
+        startUpdating();
+        Thread engineThread = new Thread(()->
+            matchingEngine.runEngine()
+        );
+        engineThread.setDaemon(true);
+        engineThread.start();
+
+    }
+
+    private void startUpdating() {
         AnimationTimer timer = new AnimationTimer() {
-            @Override
-            public void handle(long l) {
-                updateOrderBook();
+            private long lastUpdate = 0;
+        @Override
+        public void handle(long now) {
+            if (now - lastUpdate>150_000_000){
+                String booktext = matchingEngine.book.printBook();
+                textArea.setText(booktext);
+                lastUpdate = now;
             }
-        };
+        }
+    };
         timer.start();
     }
-
-    private void updateOrderBook() {
-    }
-
 
     private HBox createTopPanel() {
         HBox topPanel  = new HBox(20);
@@ -55,11 +76,23 @@ public class OrderBookGui extends Application {
             GridPane gridPane = new GridPane();
             gridPane.setPadding(new Insets(15));
             Label bidsHeader = new Label("BID");
-            Label askHeader = new Label("ASK");
+            Label asksHeader = new Label("ASK");
             Label priceHeader = new Label("PRICE");
 
+            gridPane.add(bidsHeader, 0, 0, 2, 1);
+            gridPane.add(asksHeader, 2, 0, 2, 1);
+
+            var bidsContainer = new VBox(2);
+            var asksContainer = new VBox(2);
+            gridPane.add(bidsContainer,0,2,2,1);
+            gridPane.add(asksContainer,2,2,2,1);
+            return gridPane;
+
     }
-    private Node createBottomPanel() {
+    private HBox createBottomPanel() {
+        HBox bottomPanel = new HBox(15);
+        bottomPanel.setPadding(new Insets(10));
+        return bottomPanel;
     }
 
 

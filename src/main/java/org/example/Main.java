@@ -17,21 +17,8 @@ public class Main {
         OrderBook orderBook = new OrderBook();
         MatchingEngine matchingEngine = new MatchingEngine();
         OrderBookFrame orderBookFrame = new OrderBookFrame(matchingEngine);
-        for (Order order:Main.supplyOrders()){
-            matchingEngine.placeLimitOrder(order);
-        }
-
- }
-    private static ArrayList<Order> supplyOrders(){
-        ArrayList<Order> orders = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            orders.add(new Order(
-                    new BigDecimal(ThreadLocalRandom.current().nextInt(15,20)),
-                    ThreadLocalRandom.current().nextBoolean()?Side.BUY:Side.SELL,
-                    ThreadLocalRandom.current().nextInt(10,100)
-            ));
-        }
-        return orders;
+        OrderBookGui orderBookGui = new OrderBookGui();
     }
+
 
 }

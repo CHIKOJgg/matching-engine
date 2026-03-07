@@ -11,7 +11,7 @@ public class OrderBook {
     TreeMap<BigDecimal, ArrayDeque<Order>> bids =new TreeMap<>(Comparator.reverseOrder());
     TreeMap<BigDecimal, ArrayDeque<Order>> asks =new TreeMap<>(Comparator.reverseOrder());
     Map<String ,Order> orderIndex =new HashMap<>();
-    void  addOrder(Order order){
+    synchronized void addOrder(Order order){
        orderIndex.put(order.getId(), order);
        if (order.getSideOfOrder()==Side.SELL){
            asks.computeIfAbsent(order.getPrice(),
@@ -84,7 +84,7 @@ public class OrderBook {
 //    void cancelOrder(String id){
 //        ordersMap.remove(id);
 //    }
-    public String printBook(){
+    public  synchronized  String printBook(){
        StringBuilder sbFinal = new StringBuilder();
        StringBuilder sbAsks = printAsks();
        StringBuilder sbBids = printBids();

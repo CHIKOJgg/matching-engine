@@ -5,8 +5,10 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.plaf.metal.MetalTheme;
 import java.math.BigDecimal;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 public class MatchingEngine {
@@ -101,5 +103,20 @@ public class MatchingEngine {
                 book.addOrder(order);
             }
         }
+    }
+    public void runEngine(){
+        ArrayList<Order> orders = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            orders.add(new Order(
+                    new BigDecimal(ThreadLocalRandom.current().nextInt(15,20)),
+                    ThreadLocalRandom.current().nextBoolean()?Side.BUY:Side.SELL,
+                    ThreadLocalRandom.current().nextInt(10,100)
+            ));
+        }
+        for (Order order:orders){
+            this.placeLimitOrder(order);
+        }
+
+
     }
 }
