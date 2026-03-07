@@ -70,11 +70,11 @@ public class OrderBook {
 
         }
     }
-    public Map.Entry<BigDecimal,ArrayDeque<Order>> getBestBid(){
+    public synchronized  Map.Entry<BigDecimal,ArrayDeque<Order>>  getBestBid(){
         if (bids.isEmpty())return null;
        return bids.firstEntry();
     }
-    public Map.Entry<BigDecimal, ArrayDeque<Order>> getBestAsk(){
+    public synchronized  Map.Entry<BigDecimal, ArrayDeque<Order>> getBestAsk(){
         if (asks.isEmpty())return null;
         return asks.lastEntry();
     }
@@ -115,7 +115,7 @@ public class OrderBook {
         System.out.println("-------bids----------");
         return sb;
     }
-    public void removeEmptyLevelBids(BigDecimal price) {
+    public synchronized  void removeEmptyLevelBids(BigDecimal price) {
        var bidsGet = bids.get(price);
        if (bidsGet==null){
            System.out.println("ArrayDeque<order> is void at price: " + price);
@@ -129,7 +129,7 @@ public class OrderBook {
                 System.out.println("bid level contains orders");
             }
     }
-    public void removeEmptyLevelAsks(BigDecimal price) {
+    public synchronized  void removeEmptyLevelAsks(BigDecimal price) {
         if (asks.get(price).isEmpty()){
             asks.remove(price);
         }
