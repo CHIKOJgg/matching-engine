@@ -84,28 +84,36 @@ public class OrderBook {
 //    void cancelOrder(String id){
 //        ordersMap.remove(id);
 //    }
-    public void printBook(){
-        printAsks();
-        System.out.println("----------------");
-        printBids();
+    public String printBook(){
+       StringBuilder sbFinal = new StringBuilder();
+       StringBuilder sbAsks = printAsks();
+       StringBuilder sbBids = printBids();
+       sbFinal.append(sbAsks);
+       sbFinal.append("----------------").append("\n");;
+       sbFinal.append(sbBids);
+       return sbFinal.toString();
     }
-    private void printAsks(){
-        System.out.println("--------asks----------");
+    private StringBuilder printAsks(){
+        StringBuilder sb = new StringBuilder();
+        sb.append("--------asks----------").append("\n");
         var listOfAsks = new ArrayList<>(asks.keySet());
         listOfAsks.reversed();
          for (BigDecimal price:listOfAsks){
-             System.out.printf("ASK  | %5s | %d orders%n ", price, asks.get(price).size());
+             sb.append("ASK  | ").append(price).append(" |").append(asks.get(price).size()).append(" orders").append("\n");
          }
+         return sb;
 
     }
-    private void printBids(){
+    private StringBuilder printBids(){
+        StringBuilder sb =new StringBuilder();
 
         var listOfBids = new ArrayList<>(bids.keySet());
         listOfBids.reversed();
         for (BigDecimal price:listOfBids){
-            System.out.printf("ASK  | %5s | %d orders%n ", price, bids.get(price).size());
+            sb.append("BIDS  | ").append(price).append(" |").append( bids.get(price).size()).append(" orders").append("\n");
         }
         System.out.println("-------bids----------");
+        return sb;
     }
     public void removeEmptyLevelBids(BigDecimal price) {
        var bidsGet = bids.get(price);

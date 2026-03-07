@@ -21,13 +21,14 @@ public class MatchingEngine {
     //while (!book.asks.isEmpty() && book.getBestAsk().getKey().compareTo(order.getPrice()) <= 0)
 
     public void placeLimitOrder(Order order){
+        try {
+            TimeUnit.MILLISECONDS.sleep(30);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         Side newOrderSide = order.getSideOfOrder();
         int remainingQ = order.getQuantity();
-        System.out.println(order.getPrice() +" " + order.getQuantity() +" " + order.getTimestamp() +" " + order.getSideOfOrder());
-
-
         if (newOrderSide.equals(Side.BUY)){
-            System.out.println(order.getPrice() + " trying to fill buy order ");
             Map.Entry<BigDecimal, ArrayDeque<Order>> bestAsk = book.getBestAsk();
             while(remainingQ>0 && bestAsk!=null
                     && bestAsk.getKey().compareTo(order.getPrice())<=0){
@@ -63,7 +64,6 @@ public class MatchingEngine {
 
 
         }else {
-            System.out.println(order.getPrice() + " trying to fill sell order");
             Map.Entry<BigDecimal, ArrayDeque<Order>> bestBid = book.getBestBid();
             while (remainingQ > 0 && bestBid != null && bestBid.getKey().compareTo(order.getPrice()) >= 0) {
                 ArrayDeque<Order> levelQueue = bestBid.getValue();
@@ -101,7 +101,5 @@ public class MatchingEngine {
                 book.addOrder(order);
             }
         }
-
-        book.printBook();
     }
 }

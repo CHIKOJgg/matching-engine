@@ -30,21 +30,32 @@ public class Order implements Comparable<Order>{
         this.timestamp = 123;
         this.remainingQuantity =  quantity;
     }
-    public Order(Side side) {
-        this.id = "templateID";
-        this.price = new BigDecimal(123);
-        this.quantity = 1;
+    public Order(BigDecimal price,Side side, int quantity) {
+        this.id = "uid" + ThreadLocalRandom.current().nextInt(0,100000);
+        this.price =price;
+        this.quantity =quantity ;
         this.sideOfOrder = side;
-        this.timestamp = 123;
+        this.timestamp = LocalTime.now().getNano();
         this.remainingQuantity =  quantity;
-    } public Order(Side side, int quantity) {
+    }
+//TODO rebuild with constructors
+    public static Order createNewOrder(Side side){
+        return new Order(
+                "uid" + ThreadLocalRandom.current().nextInt(0,100000),
+                Side.SELL.equals(side)? bidPrice().multiply(new BigDecimal(5)):askPrice().multiply(new BigDecimal(5)),
+                1,
+                side,
+                LocalTime.now().getNano());
+    }
+    public Order(Side side, int quantity) {
         this.id = "templateID";
         this.price = new BigDecimal(123);
         this.quantity = quantity;
         this.sideOfOrder = side;
         this.timestamp = 123;
         this.remainingQuantity =  this.quantity;
-    }public Order(BigDecimal price, Side side) {
+    }
+    public Order(BigDecimal price, Side side) {
         this.id = "templateID";
         this.price =price;
         this.quantity = 1;
@@ -103,15 +114,7 @@ public class Order implements Comparable<Order>{
     public static BigDecimal askPrice(){
         return new BigDecimal(ThreadLocalRandom.current().nextLong(26,32));
     }
-//TODO rebuild with constructors
-    public static Order createNewOrder(Side side){
-        return new Order(
-                "uid" + ThreadLocalRandom.current().nextInt(0,100000),
-                Side.SELL.equals(side)? bidPrice().multiply(new BigDecimal(5)):askPrice().multiply(new BigDecimal(5)),
-                1,
-                side,
-                LocalTime.now().getNano());
-    }
+
 
     @Override
     public int compareTo(Order o) {
