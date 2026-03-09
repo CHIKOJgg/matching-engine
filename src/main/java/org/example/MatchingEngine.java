@@ -24,10 +24,11 @@ public class MatchingEngine {
 
     public void placeLimitOrder(Order order){
         try {
-            TimeUnit.MILLISECONDS.sleep(3);
+            TimeUnit.MILLISECONDS.sleep(10);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        //TODO turn place limit order into more methods in order to get readability
         Side newOrderSide = order.getSideOfOrder();
         int remainingQ = order.getQuantity();
         if (newOrderSide.equals(Side.BUY)){
@@ -105,18 +106,19 @@ public class MatchingEngine {
         }
     }
     public void runEngine(){
-        ArrayList<Order> orders = new ArrayList<>();
         for (int i = 0; i < 100000; i++) {
-            orders.add(new Order(
-                    new BigDecimal(ThreadLocalRandom.current().nextInt(15,25)),
-                    ThreadLocalRandom.current().nextBoolean()?Side.BUY:Side.SELL,
-                    ThreadLocalRandom.current().nextInt(10,100)
-            ));
-        }
-        for (Order order:orders){
+            Order order = new Order.Builder().build();
             this.placeLimitOrder(order);
+            if (ThreadLocalRandom.current().nextInt(1,3)==2) {
+                this.book.cancelOrder(order.getId());
+            }
         }
-
+    }
+    public void run(){
+        this.placeLimitOrder(new Order.Builder().addPrice(new BigDecimal(50)).addQuantity(50).addSide(Side.BUY).build());
+        this.placeLimitOrder(new Order.Builder().addPrice(new BigDecimal(50)).addQuantity(50).addSide(Side.BUY).build());
+        this.placeLimitOrder(new Order.Builder().addPrice(new BigDecimal(50)).addQuantity(50).addSide(Side.BUY).build());
+        this.placeLimitOrder(new Order.Builder().addPrice(new BigDecimal(49)).addQuantity(200).addSide(Side.SELL).build());
 
     }
 }

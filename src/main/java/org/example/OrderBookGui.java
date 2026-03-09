@@ -33,7 +33,7 @@ public class OrderBookGui extends Application{
             private long lastUpdate = 0;
         @Override
         public void handle(long now) {
-            if (now - lastUpdate>1_000_000){
+            if (now - lastUpdate>30_000_000){
                 updateTables();
                 lastUpdate = now;
             }
@@ -46,14 +46,17 @@ public class OrderBookGui extends Application{
 
         List<BookRow> bids = new ArrayList<>();
         List<BookRow> asks = new ArrayList<>();
-
         synchronized (matchingEngine.book) {
-
+            ArrayList<Integer> bidsVolumes = new ArrayList<>();
+            ArrayList<Integer> asksVolumes = new ArrayList<>();;
             matchingEngine.book.bids.forEach((price, queue) -> {
 
                 int volume = queue.stream()
                         .mapToInt(o -> o.getQuantity())
                         .sum();
+                bidsVolumes.add(volume);
+             //TODO refactor and implement orderbook depth with colors
+
 
                 bids.add(new BookRow(
                         price.toString(),
@@ -62,25 +65,28 @@ public class OrderBookGui extends Application{
                 ));
             });
 
+            //int maxVolumeBids = bidsVolumes.stream().mapToInt(i->i).max();
             matchingEngine.book.asks.forEach((price, queue) -> {
 
                 int volume = queue.stream()
                         .mapToInt(o -> o.getQuantity())
                         .sum();
-
+                asksVolumes.add(volume);
                 asks.add(new BookRow(
                         price.toString(),
                         String.valueOf(volume),
                         String.valueOf(queue.size())
                 ));
             });
+
+           //int maxAskVol =  Collections.max(asksVolumes);
+           //int maxBidVol =  Collections.max(bidsVolumes);
+
         }
 
         Platform.runLater(() -> {
-
             bidsTable.getItems().setAll(bids);
             asksTable.getItems().setAll(asks);
-
         });
     }
     @Override

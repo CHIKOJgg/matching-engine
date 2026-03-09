@@ -41,8 +41,8 @@ public class MatchingEngineTest {
     }
     public static Stream<Arguments> supplyBuyAndSellOrders(){
         return  Stream.of(
-                Arguments.of(new Order(Side.BUY)),
-                        Arguments.of(new Order(Side.SELL))
+                Arguments.of(new Order.Builder().addSide(Side.BUY).build()),
+                Arguments.of(new Order.Builder().addSide(Side.SELL).build())
         );
     }
     @ParameterizedTest
@@ -65,8 +65,8 @@ public class MatchingEngineTest {
     @Test
     public void matchingOfOrders(){
         //
-        matchingEngine.placeLimitOrder(new Order(Side.BUY));
-        matchingEngine.placeLimitOrder(new Order(Side.SELL));
+        matchingEngine.placeLimitOrder(new Order.Builder().addSide(Side.BUY).build());
+        matchingEngine.placeLimitOrder(new Order.Builder().addSide(Side.SELL).build());
 
         var isEmptyBids = matchingEngine.getBook().getBestBid();
         var isEmptyAsks = matchingEngine.getBook().getBestAsk();
@@ -110,10 +110,26 @@ public class MatchingEngineTest {
     @Test
     public void fifoOrderExecution() throws InterruptedException {
 
-        Order orderBuy5a = new Order("buy5a", new BigDecimal(100), 5, Side.BUY, 1);
-        Order orderBuy5b = new Order("buy5b", new BigDecimal(100), 5, Side.BUY, 2);
-        Order orderBuy5c = new Order("buy5c", new BigDecimal(100), 5, Side.BUY, 3);
-        Order orderSell7 = new Order("sell7", new BigDecimal(100), 7, Side.SELL, 4);
+        Order orderBuy5a = new Order.Builder()
+                .addId("buy5a")
+                .addPrice(new BigDecimal(100))
+                .addQuantity(5).addSide(Side.BUY)
+                .build();
+        Order orderBuy5b = new Order.Builder()
+                .addId("buy5a")
+                .addPrice(new BigDecimal(100))
+                .addQuantity(5).addSide(Side.BUY)
+                .build();
+        Order orderBuy5c = new Order.Builder()
+                .addId("buy5c")
+                .addPrice(new BigDecimal(100))
+                .addQuantity(5).addSide(Side.BUY)
+                .build();
+        Order orderSell7 = new Order.Builder()
+                .addId("sell15a")
+                .addPrice(new BigDecimal(100))
+                .addQuantity(15).addSide(Side.SELL)
+                .build();
 
         matchingEngine.placeLimitOrder(orderBuy5a);
         matchingEngine.placeLimitOrder(orderBuy5b);
