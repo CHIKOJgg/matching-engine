@@ -80,12 +80,6 @@ public static Stream<Arguments> supplyTestDataForNewOrder() {
         testOrderBuy.setRemainingQuantity(12);
         Assertions.assertEquals(1, testOrderBuy.getQuantity());
     }
-
-    @Test
-    void getTimestamp() {
-        testOrderBuy.setTimestamp(123);
-        Assertions.assertEquals(123, testOrderBuy.getTimestamp());
-    }
     @Test
     public void bidPriceTestShouldReturnFrom32to38(){
         org.assertj.core.api.Assertions.assertThat(Order.bidPrice()).isBetween(new BigDecimal(32),new BigDecimal(38));

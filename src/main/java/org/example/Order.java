@@ -4,16 +4,54 @@ import javax.swing.*;
 import java.math.BigDecimal;
 import java.security.PublicKey;
 import java.time.LocalTime;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class Order implements Comparable<Order>{
-    private String id;
-    private BigDecimal price;
-    private int quantity;
-    private Side sideOfOrder;
-    private long timestamp;
+
+    private final String id;
+    private final BigDecimal price;
+    private  int quantity;
+    private final Side sideOfOrder;
+    private final long timestamp;
     int remainingQuantity;
 
+    //Adding builder patter functionality
+    private Order(Builder builder){
+        this.id = builder.id;
+        this.price = builder.price;
+        this.quantity = builder.quantity;
+        this.sideOfOrder = builder.sideOfOrder;
+        this.timestamp = builder.timestamp;
+        this.remainingQuantity =  builder.remainingQuantity;
+    }
+
+    public static class Builder{
+        private String id  = String.valueOf(UUID.randomUUID());
+        private BigDecimal price = new BigDecimal(ThreadLocalRandom.current().nextInt(25,52));
+        private int quantity = ThreadLocalRandom.current().nextInt(1,100);
+        private Side sideOfOrder = ThreadLocalRandom.current().nextBoolean()?Side.BUY:Side.SELL;
+        private int remainingQuantity = this.quantity;
+        private long timestamp;
+        public Builder(String id){
+            this.id = id;
+        }
+        public Builder addPrice(BigDecimal price){
+            this.price = price;
+            return this;
+        }public Builder addQuantity(int quantity){
+            this.quantity = quantity;
+            return this;
+        }public Builder addSide( Side side){
+            this.sideOfOrder = side;
+            return this;
+        }
+        public Order build(){
+            return new Order(this);
+        }
+
+
+    }
     public Order(String id, BigDecimal price, int quantity, Side sideOfOrder, long timestamp) {
         this.id = id;
         this.price = price;
@@ -22,6 +60,7 @@ public class Order implements Comparable<Order>{
         this.timestamp = timestamp;
         this.remainingQuantity =  quantity;
     }
+
     public Order() {
         this.id = "templateID";
         this.price = new BigDecimal(123);
@@ -72,18 +111,9 @@ public class Order implements Comparable<Order>{
         return timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public Side getSideOfOrder() {
         return sideOfOrder;
     }
-
-    public void setSideOfOrder(Side sideOfOrder) {
-        this.sideOfOrder = sideOfOrder;
-    }
-
     public int getQuantity() {
         return quantity;
     }
@@ -91,21 +121,13 @@ public class Order implements Comparable<Order>{
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
-
+//TODO разобраться как избежать использования
     public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
     public String getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
     public static BigDecimal bidPrice(){
         return new BigDecimal(ThreadLocalRandom.current().nextLong(32,38));

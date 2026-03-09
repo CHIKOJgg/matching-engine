@@ -41,8 +41,8 @@ public class MatchingEngineTest {
     }
     public static Stream<Arguments> supplyBuyAndSellOrders(){
         return  Stream.of(
-                Arguments.of(new Order(Side.BUY)),
-                        Arguments.of(new Order(Side.SELL))
+                Arguments.of(new Order.Builder("123").addSide(Side.BUY).build()),
+                Arguments.of(new Order.Builder("1237").addSide(Side.SELL).build())
         );
     }
     @ParameterizedTest
@@ -65,8 +65,8 @@ public class MatchingEngineTest {
     @Test
     public void matchingOfOrders(){
         //
-        matchingEngine.placeLimitOrder(new Order(Side.BUY));
-        matchingEngine.placeLimitOrder(new Order(Side.SELL));
+        matchingEngine.placeLimitOrder(new Order.Builder("qe").addSide(Side.BUY).build());
+        matchingEngine.placeLimitOrder(new Order.Builder("qe").addSide(Side.SELL).build());
 
         var isEmptyBids = matchingEngine.getBook().getBestBid();
         var isEmptyAsks = matchingEngine.getBook().getBestAsk();
