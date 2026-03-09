@@ -24,10 +24,11 @@ public class MatchingEngine {
 
     public void placeLimitOrder(Order order){
         try {
-            TimeUnit.MILLISECONDS.sleep(1500);
+            TimeUnit.MILLISECONDS.sleep(10);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        //TODO turn place limit order into more methods in order to get readability
         Side newOrderSide = order.getSideOfOrder();
         int remainingQ = order.getQuantity();
         if (newOrderSide.equals(Side.BUY)){
