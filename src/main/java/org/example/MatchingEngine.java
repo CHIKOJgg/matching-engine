@@ -24,7 +24,7 @@ public class MatchingEngine {
 
     public void placeLimitOrder(Order order){
         try {
-            TimeUnit.MILLISECONDS.sleep(5);
+            TimeUnit.MILLISECONDS.sleep(1500);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -106,8 +106,18 @@ public class MatchingEngine {
     }
     public void runEngine(){
         for (int i = 0; i < 100000; i++) {
-            this.placeLimitOrder(new Order.Builder().build());
-
+            Order order = new Order.Builder().build();
+            this.placeLimitOrder(order);
+            if (ThreadLocalRandom.current().nextInt(1,3)==2) {
+                this.book.cancelOrder(order.getId());
+            }
         }
+    }
+    public void run(){
+        this.placeLimitOrder(new Order.Builder().addPrice(new BigDecimal(50)).addQuantity(50).addSide(Side.BUY).build());
+        this.placeLimitOrder(new Order.Builder().addPrice(new BigDecimal(50)).addQuantity(50).addSide(Side.BUY).build());
+        this.placeLimitOrder(new Order.Builder().addPrice(new BigDecimal(50)).addQuantity(50).addSide(Side.BUY).build());
+        this.placeLimitOrder(new Order.Builder().addPrice(new BigDecimal(49)).addQuantity(200).addSide(Side.SELL).build());
+
     }
 }

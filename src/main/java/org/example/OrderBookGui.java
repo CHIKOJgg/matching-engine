@@ -46,7 +46,6 @@ public class OrderBookGui extends Application{
 
         List<BookRow> bids = new ArrayList<>();
         List<BookRow> asks = new ArrayList<>();
-
         synchronized (matchingEngine.book) {
             ArrayList<Integer> bidsVolumes = new ArrayList<>();
             ArrayList<Integer> asksVolumes = new ArrayList<>();;
@@ -72,20 +71,22 @@ public class OrderBookGui extends Application{
                 int volume = queue.stream()
                         .mapToInt(o -> o.getQuantity())
                         .sum();
-
+                asksVolumes.add(volume);
                 asks.add(new BookRow(
                         price.toString(),
                         String.valueOf(volume),
                         String.valueOf(queue.size())
                 ));
             });
+
+           //int maxAskVol =  Collections.max(asksVolumes);
+           //int maxBidVol =  Collections.max(bidsVolumes);
+
         }
 
         Platform.runLater(() -> {
-
             bidsTable.getItems().setAll(bids);
             asksTable.getItems().setAll(asks);
-
         });
     }
     @Override
