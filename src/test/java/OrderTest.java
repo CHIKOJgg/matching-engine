@@ -27,15 +27,28 @@ public class OrderTest  extends  TestBase{
     static Order testOrderSell;
     @BeforeEach
     public void setUpTestOrder(){
-        testOrderSell = new Order("idofOrderSell", new BigDecimal(100), 1, Side.SELL, 100);
-        testOrderBuy = new Order("idofOrderBuy", new BigDecimal(10), 1, Side.BUY, 100);
+        testOrderSell = new Order.Builder()
+                .addId("buy5a")
+                .addPrice(new BigDecimal(100))
+                .addQuantity(5)
+                .addSide(Side.SELL)
+                .build();
+        testOrderBuy = new Order.Builder()
+                .addId("buy5a")
+                .addPrice(new BigDecimal(100))
+                .addQuantity(5).addSide(Side.BUY)
+                .build();
     }
 
     @MethodSource("supplyTestDataForNewOrderRaw")
     @ParameterizedTest
     @DisplayName("test of order constructor edge cases")
     public void OrderTestOfCreationNewOrder (String id, BigDecimal price, int q, Side side, long timestamp){
-        Order order = new Order(id, price, q, side, timestamp);
+        Order order = new Order.Builder()
+                .addId(id)
+                .addPrice(price)
+                .addQuantity(q).addSide(side)
+                .build();
     }
     @Test
     @DisplayName("performance")
@@ -43,7 +56,11 @@ public class OrderTest  extends  TestBase{
       Order orderOptional = Assertions.assertTimeout(Duration.ofMillis(100),
         ()-> {
             TimeUnit.MILLISECONDS.sleep(5);
-            return new Order("idofOrder", new BigDecimal(0), 1, Side.SELL, 245);
+            return  new Order.Builder()
+                    .addId("buy5a")
+                    .addPrice(new BigDecimal(100))
+                    .addQuantity(5).addSide(Side.BUY)
+                    .build();
       });
         if (orderOptional!=null){
             Assertions.assertTrue(true);
@@ -62,23 +79,40 @@ public class OrderTest  extends  TestBase{
     );}
 public static Stream<Arguments> supplyTestDataForNewOrder() {
     return Stream.of(
-            Arguments.of(new Order("", new BigDecimal(0), 1, Side.BUY, 245)),
-            Arguments.of(new Order("idofOrder", new BigDecimal(0), 1, Side.SELL, 245)),
-            Arguments.of(new Order("", new BigDecimal("0.5"), 1, null, 245))
+            Arguments.of(new Order.Builder()
+                    .addId("idofOrder")
+                    .addPrice(new BigDecimal(100))
+                    .addQuantity(5).addSide(Side.BUY)
+                    .build()),
+            Arguments.of(new Order.Builder()
+                    .addId("idofOrder")
+                    .addPrice(new BigDecimal(0))
+                    .addQuantity(1).addSide(Side.SELL)
+                    .build()),
+            Arguments.of(new Order.Builder()
+                    .addId("buy5a")
+                    .addPrice(new BigDecimal(100))
+                    .addQuantity(5).addSide(Side.BUY)
+                    .build())
     );}
     @ParameterizedTest
     @MethodSource("supplyTestDataForNewOrder")
     public void testOrdersComparison (Order order) throws IOException {
-        Order orderComparable = new Order("idofOrder", new BigDecimal(1), 1, Side.SELL, 245);
+        Order orderComparable = new Order.Builder()
+                .addId("idofOrder")
+                .addPrice(new BigDecimal(101))
+                .addQuantity(1).addSide(Side.SELL)
+                .build();
+
         int orderCompResult = orderComparable.compareTo(order);
-        Assertions.assertEquals(1 , orderCompResult);
+        Assertions.assertEquals(1, orderCompResult);
 
     }
 
     @Test
     void setRemainingQuantity() {
         testOrderBuy.setRemainingQuantity(12);
-        Assertions.assertEquals(1, testOrderBuy.getQuantity());
+        Assertions.assertEquals(5, testOrderBuy.getQuantity());
     }
     @Test
     public void bidPriceTestShouldReturnFrom32to38(){

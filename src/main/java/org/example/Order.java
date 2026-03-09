@@ -33,8 +33,11 @@ public class Order implements Comparable<Order>{
         private Side sideOfOrder = ThreadLocalRandom.current().nextBoolean()?Side.BUY:Side.SELL;
         private int remainingQuantity = this.quantity;
         private long timestamp;
-        public Builder(String id){
+        public Builder(){
+        }
+        public Builder addId(String id){
             this.id = id;
+            return this;
         }
         public Builder addPrice(BigDecimal price){
             this.price = price;
@@ -52,14 +55,14 @@ public class Order implements Comparable<Order>{
 
 
     }
-    public Order(String id, BigDecimal price, int quantity, Side sideOfOrder, long timestamp) {
-        this.id = id;
-        this.price = price;
-        this.quantity = quantity;
-        this.sideOfOrder = sideOfOrder;
-        this.timestamp = timestamp;
-        this.remainingQuantity =  quantity;
-    }
+//    public Order(String id, BigDecimal price, int quantity, Side sideOfOrder, long timestamp) {
+//        this.id = id;
+//        this.price = price;
+//        this.quantity = quantity;
+//        this.sideOfOrder = sideOfOrder;
+//        this.timestamp = timestamp;
+//        this.remainingQuantity =  quantity;
+//    }
 
     public Order() {
         this.id = "templateID";
@@ -69,23 +72,15 @@ public class Order implements Comparable<Order>{
         this.timestamp = 123;
         this.remainingQuantity =  quantity;
     }
-    public Order(BigDecimal price,Side side, int quantity) {
-        this.id = "uid" + ThreadLocalRandom.current().nextInt(0,100000);
-        this.price =price;
-        this.quantity =quantity ;
-        this.sideOfOrder = side;
-        this.timestamp = LocalTime.now().getNano();
-        this.remainingQuantity =  quantity;
-    }
 //TODO rebuild with constructors
-    public static Order createNewOrder(Side side){
-        return new Order(
-                "uid" + ThreadLocalRandom.current().nextInt(0,100000),
-                Side.SELL.equals(side)? bidPrice().multiply(new BigDecimal(5)):askPrice().multiply(new BigDecimal(5)),
-                1,
-                side,
-                LocalTime.now().getNano());
-    }
+//    public static Order createNewOrder(Side side){
+//        return new Order(
+//                "uid" + ThreadLocalRandom.current().nextInt(0,100000),
+//                Side.SELL.equals(side)? bidPrice().multiply(new BigDecimal(5)):askPrice().multiply(new BigDecimal(5)),
+//                1,
+//                side,
+//                LocalTime.now().getNano());
+//    }
     public Order(Side side, int quantity) {
         this.id = "templateID";
         this.price = new BigDecimal(123);
