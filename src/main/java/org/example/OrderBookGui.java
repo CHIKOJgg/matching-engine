@@ -120,7 +120,7 @@ public class OrderBookGui extends Application{
         stage.show();
         startUpdating();
         Thread engineThread = new Thread(()->
-            matchingEngine.runEngine()
+            matchingEngine.run()
         );
         engineThread.setDaemon(true);
         engineThread.start();

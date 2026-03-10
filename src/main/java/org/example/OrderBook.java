@@ -1,5 +1,7 @@
 package org.example;
 
+import org.slf4j.LoggerFactory;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalTime;
@@ -8,10 +10,11 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.logging.Logger;
 
 public class OrderBook {
+
     TreeMap<BigDecimal, ArrayDeque<Order>> bids =new TreeMap<>(Comparator.reverseOrder());
     TreeMap<BigDecimal, ArrayDeque<Order>> asks =new TreeMap<>(Comparator.reverseOrder());
     Map<String ,Order> orderIndex =new HashMap<>();
-    synchronized void addOrder(Order order){
+     synchronized void addOrder(Order order){
        orderIndex.put(order.getId(), order);
        if (order.getSideOfOrder()==Side.SELL){
            asks.computeIfAbsent(order.getPrice(),
@@ -25,10 +28,10 @@ public class OrderBook {
     public void cancelOrder(String orderId){
 
         Order order = orderIndex.remove(orderId);
-
         if (order ==null){
             return;
         }
+
         ArrayDeque<Order> level;
         if (order.getSideOfOrder()==Side.BUY){
           level = bids.get(order.getPrice());
@@ -44,6 +47,7 @@ public class OrderBook {
             level!=null)
         {
            boolean removed = level.removeIf(order1 -> {
+               order1.setStatus(OrderStatus.CANCELLED);
                 System.out.println("order" + orderId + "successfully deleted order");
                 return order1.getId().equals(orderId);
             });
@@ -61,6 +65,8 @@ public class OrderBook {
                 level!=null){
 
           boolean removed =  level.removeIf(order1 -> {
+                order1.setStatus(OrderStatus.CANCELLED);
+
                 System.out.println("order" + orderId + "successfully deleted");
                 return order1.getId().equals(orderId);
             });
