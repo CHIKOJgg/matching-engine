@@ -1,10 +1,12 @@
 package org.example;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -97,13 +99,18 @@ public class OrderBookGui extends Application{
         configureTable(asksTable);
         Label bidsLabel= new Label("BIDS");
         Label asksLabel= new Label("ASKS");
+        Button buttonSell = new Button();
+        Button buttonBuy = new Button();
+        buttonBuy.setOnMouseEntered();
+        EventHandler<MouseEvent> mouseEventEventHandler;
+
         bidsLabel.setStyle("-fx-text-fill:#2ecc71; -fx-font-size:16px;");
         asksLabel.setStyle("-fx-text-fill:#e74c3c; -fx-font-size:16px;");
         VBox bidsBox= new VBox(5, bidsLabel,bidsTable);
         VBox asksBox = new VBox(5, asksLabel,asksTable);
         VBox tables = new VBox(10, asksBox, bidsBox);
         tables.setPadding(new Insets(10));
-        Scene scene= new Scene(tables, 600,600);
+        Scene scene= new Scene(tables, 600,1000);
         VBox.setVgrow(bidsTable, Priority.ALWAYS);
         VBox.setVgrow(asksTable, Priority.ALWAYS);
         // configureTable();
@@ -120,7 +127,7 @@ public class OrderBookGui extends Application{
         stage.show();
         startUpdating();
         Thread engineThread = new Thread(()->
-            matchingEngine.run()
+            matchingEngine.runEngine()
         );
         engineThread.setDaemon(true);
         engineThread.start();
