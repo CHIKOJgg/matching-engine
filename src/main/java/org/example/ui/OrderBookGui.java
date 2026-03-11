@@ -1,4 +1,4 @@
-package org.example.GUI;
+package org.example.ui;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -11,9 +11,9 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.*;
-import org.example.MatchingEngine;
-import org.example.domains.Order;
-import org.example.Side;
+import org.example.domain.service.MatchingEngine;
+import org.example.domain.model.Order;
+import org.example.domain.model.Side;
 
 import java.math.BigDecimal;
 import java.util.*;
@@ -33,7 +33,7 @@ public class OrderBookGui extends Application{
             private long lastUpdate = 0;
         @Override
         public void handle(long now) {
-            if (now - lastUpdate>30_000_000){
+            if (now - lastUpdate>1_000_000){
                 updateTables();
                 lastUpdate = now;
             }
@@ -50,15 +50,12 @@ public class OrderBookGui extends Application{
             ArrayList<Integer> bidsVolumes = new ArrayList<>();
             ArrayList<Integer> asksVolumes = new ArrayList<>();
            // scanOrderBookAndCalcVolume();
-            matchingEngine.getBook().bids.forEach((price, queue) -> {
-
+            matchingEngine.getBook().getBids().forEach((price, queue) -> {
                 int volume = queue.stream()
                         .mapToInt(o -> o.getQuantity())
                         .sum();
                 bidsVolumes.add(volume);
              //TODO refactor and implement orderbook depth with colors
-
-
                 bids.add(new BookRow(
                         price.toString(),
                         String.valueOf(volume),
@@ -67,7 +64,7 @@ public class OrderBookGui extends Application{
             });
 
             //int maxVolumeBids = bidsVolumes.stream().mapToInt(i->i).max();
-            matchingEngine.getBook().asks.forEach((price, queue) -> {
+            matchingEngine.getBook().getAsks().forEach((price, queue) -> {
 
                 int volume = queue.stream()
                         .mapToInt(o -> o.getQuantity())

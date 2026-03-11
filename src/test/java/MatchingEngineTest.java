@@ -1,7 +1,7 @@
-import org.example.MatchingEngine;
-import org.example.domains.Order;
-import org.example.OrderStatus;
-import org.example.Side;
+import org.example.domain.service.MatchingEngine;
+import org.example.domain.model.Order;
+import org.example.domain.model.OrderStatus;
+import org.example.domain.model.Side;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

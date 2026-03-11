@@ -1,5 +1,5 @@
-import org.example.domains.Order;
-import org.example.Side;
+import org.example.domain.model.Order;
+import org.example.domain.model.Side;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

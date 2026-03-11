@@ -1,7 +1,4 @@
-package org.example.GUI;
-
-import javafx.event.EventHandler;
-import javafx.scene.control.Button;
+package org.example.ui;
 
 public class OrderBookUserButtonsFrame{
 //    Button buttonSell = new Button();

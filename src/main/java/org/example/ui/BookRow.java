@@ -1,4 +1,4 @@
-package org.example.GUI;
+package org.example.ui;
 
 import javafx.beans.property.SimpleStringProperty;
 

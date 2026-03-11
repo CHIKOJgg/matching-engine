@@ -1,6 +1,8 @@
-package org.example;
+package org.example.domain.service;
 
-import org.example.domains.Order;
+import org.example.domain.model.OrderStatus;
+import org.example.domain.model.Side;
+import org.example.domain.model.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,7 +26,7 @@ public class MatchingEngine {
 
     public void placeLimitOrder(Order order){
         try {
-            TimeUnit.MILLISECONDS.sleep(10);
+            TimeUnit.MILLISECONDS.sleep(0);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -55,7 +57,7 @@ public class MatchingEngine {
                     int executed = Math.min(top.getQuantity(),remainingQ);
                     remainingQ-=executed;
                     top.setQuantity(top.getQuantity() -executed);
-                    System.out.println("Order matched" + top.getId() + " with" + order.getId() + "with price" + top.getPrice());
+                log.debug("Order matched{} with{}with price{}", top.getId(), order.getId(), top.getPrice());
                     if (top.getQuantity() == 0) {
                         top.setStatus(OrderStatus.FILLED);
                         levelQueue.pollFirst();
@@ -91,7 +93,7 @@ public class MatchingEngine {
                 remainingQ -= executed;
                 top.setQuantity(top.getQuantity() - executed);
 
-                System.out.println("Order matched " + top.getId() + " with " + order.getId() + " price " + top.getPrice());
+                log.debug("Order matched {} with {} price {}", top.getId(), order.getId(), top.getPrice());
 
                 if (top.getQuantity() == 0) {
                     top.setStatus(OrderStatus.FILLED);
@@ -123,7 +125,7 @@ public class MatchingEngine {
         }
     }
     public void runEngine(){
-        for (int i = 0; i < 100000; i++) {
+        for (int i = 0; i < 1000000; i++) {
             Order order = new Order.Builder().build();
             this.placeLimitOrder(order);
             if (ThreadLocalRandom.current().nextInt(1,3)==2) {

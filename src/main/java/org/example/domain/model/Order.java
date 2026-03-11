@@ -1,7 +1,4 @@
-package org.example.domains;
-
-import org.example.OrderStatus;
-import org.example.Side;
+package org.example.domain.model;
 
 import java.math.BigDecimal;
 import java.util.UUID;
