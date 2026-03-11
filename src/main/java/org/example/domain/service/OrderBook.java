@@ -1,19 +1,39 @@
-package org.example;
+package org.example.domain.service;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.example.domain.model.OrderStatus;
+import org.example.domain.model.Side;
+import org.example.domain.model.Order;
 
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.LocalTime;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.logging.Logger;
 
 public class OrderBook {
-    TreeMap<BigDecimal, ArrayDeque<Order>> bids =new TreeMap<>(Comparator.reverseOrder());
-    TreeMap<BigDecimal, ArrayDeque<Order>> asks =new TreeMap<>(Comparator.reverseOrder());
-    Map<String ,Order> orderIndex =new HashMap<>();
-    synchronized void addOrder(Order order){
+
+    private static final Logger log = LogManager.getLogger(OrderBook.class);
+    private final NavigableMap<BigDecimal, ArrayDeque<Order>> bids =new TreeMap<>(Comparator.reverseOrder());
+
+
+    private final NavigableMap<BigDecimal, ArrayDeque<Order>> asks =new TreeMap<>(Comparator.reverseOrder());
+
+    public NavigableMap<BigDecimal, ArrayDeque<Order>> getAsks() {
+        return asks;
+    }
+
+    public NavigableMap<BigDecimal, ArrayDeque<Order>> getBids() {
+        return bids;
+    }
+
+    private final Map<String ,Order> orderIndex =new HashMap<>();
+
+    public Map<String, Order> getOrderIndex() {
+        return orderIndex;
+    }
+
+    public synchronized void addOrder(Order order){
        orderIndex.put(order.getId(), order);
-       if (order.getSideOfOrder()==Side.SELL){
+       if (order.getSideOfOrder()== Side.SELL){
            asks.computeIfAbsent(order.getPrice(),
                    k->new ArrayDeque<>()).addLast(order);
        }
@@ -23,12 +43,11 @@ public class OrderBook {
        }
     }
     public void cancelOrder(String orderId){
-
         Order order = orderIndex.remove(orderId);
-
         if (order ==null){
             return;
         }
+
         ArrayDeque<Order> level;
         if (order.getSideOfOrder()==Side.BUY){
           level = bids.get(order.getPrice());
@@ -44,6 +63,7 @@ public class OrderBook {
             level!=null)
         {
            boolean removed = level.removeIf(order1 -> {
+               order1.setStatus(OrderStatus.CANCELLED);
                 System.out.println("order" + orderId + "successfully deleted order");
                 return order1.getId().equals(orderId);
             });
@@ -61,6 +81,8 @@ public class OrderBook {
                 level!=null){
 
           boolean removed =  level.removeIf(order1 -> {
+                order1.setStatus(OrderStatus.CANCELLED);
+
                 System.out.println("order" + orderId + "successfully deleted");
                 return order1.getId().equals(orderId);
             });
@@ -118,15 +140,15 @@ public class OrderBook {
     public synchronized  void removeEmptyLevelBids(BigDecimal price) {
        var bidsGet = bids.get(price);
        if (bidsGet==null){
-           System.out.println("ArrayDeque<order> is void at price: " + price);
+           log.debug("ArrayDeque<order> is void at price: {}", price);
            return;}
 
             if (bidsGet.isEmpty()){
                 bids.remove(price);
-                System.out.println("bid level remove succeed");
+                log.debug("bid level remove succeed");
             }
             else {
-                System.out.println("bid level contains orders");
+                log.debug("bid level contains orders");
             }
     }
     public synchronized  void removeEmptyLevelAsks(BigDecimal price) {

@@ -1,0 +1,44 @@
+.button {
+    -fx-background-color: #3700b3;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4px;
+    -fx-padding: 10px 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 4, 0.2, 0, 1);
+    -fx-cursor: hand;
+    -fx-font-size: 14px;
+    -fx-min-width: 80px;
+}
+
+.button:hover {
+    -fx-background-color: #6200ee;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 8, 0.3, 0, 2);
+}
+
+.button:pressed {
+    -fx-background-color: #3700b3;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 2, 0.1, 0, 1);
+    -fx-translate-y: 1px;
+}
+
+/* Цветовые варианты */
+.button-buy {
+    -fx-background-color: #1b5e20;
+}
+.button-buy:hover {
+    -fx-background-color: #2e7d32;
+}
+
+.button-sell {
+    -fx-background-color: #b71c1c;
+}
+.button-sell:hover {
+    -fx-background-color: #c62828;
+}
+
+.button-cancel {
+    -fx-background-color: #5a5a6e;
+}
+.button-cancel:hover {
+    -fx-background-color: #6b6b7a;
+}

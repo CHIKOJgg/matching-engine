@@ -1,9 +1,6 @@
-package org.example;
+package org.example.domain.model;
 
-import javax.swing.*;
 import java.math.BigDecimal;
-import java.security.PublicKey;
-import java.time.LocalTime;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -14,10 +11,12 @@ public class Order implements Comparable<Order>{
     private  int quantity;
     private final Side sideOfOrder;
     private final long timestamp;
+    private OrderStatus status;
     int remainingQuantity;
 
     //Adding builder patter functionality
     private Order(Builder builder){
+        this.status = builder.status;
         this.id = builder.id;
         this.price = builder.price;
         this.quantity = builder.quantity;
@@ -26,8 +25,17 @@ public class Order implements Comparable<Order>{
         this.remainingQuantity =  builder.remainingQuantity;
     }
 
+    public OrderStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
     public static class Builder{
         private String id  = String.valueOf(UUID.randomUUID());
+        private OrderStatus status = OrderStatus.NEW;
         private BigDecimal price = new BigDecimal(ThreadLocalRandom.current().nextInt(25,52));
         private int quantity = ThreadLocalRandom.current().nextInt(1,100);
         private Side sideOfOrder = ThreadLocalRandom.current().nextBoolean()?Side.BUY:Side.SELL;
@@ -47,6 +55,10 @@ public class Order implements Comparable<Order>{
             return this;
         }public Builder addSide( Side side){
             this.sideOfOrder = side;
+            return this;
+        }
+        public Builder addStatus (OrderStatus status){
+            this.status = status;
             return this;
         }
         public Order build(){

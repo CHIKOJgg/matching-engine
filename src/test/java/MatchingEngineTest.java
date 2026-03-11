@@ -1,6 +1,7 @@
-import org.example.MatchingEngine;
-import org.example.Order;
-import org.example.Side;
+import org.example.domain.service.MatchingEngine;
+import org.example.domain.model.Order;
+import org.example.domain.model.OrderStatus;
+import org.example.domain.model.Side;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +28,6 @@ public class MatchingEngineTest {
         );
     }
 
-
     @BeforeEach
     public void setUp(){
         this.matchingEngine = new MatchingEngine();
@@ -36,8 +36,8 @@ public class MatchingEngineTest {
     public void deleteOrderTest(){
         matchingEngine.placeLimitOrder(new Order());
         Assertions.assertTrue(true);
-       //Mockito.when(matchingEngine.placeLimitOrder(new Order())).then(true);
-       // Mockito.doReturn(true).when(matchingEngine).placeLimitOrder(new Order());
+        // Mockito.when(matchingEngine.placeLimitOrder(new Order())).then(true);
+        // Mockito.doReturn(true).when(matchingEngine).placeLimitOrder(new Order());
     }
     public static Stream<Arguments> supplyBuyAndSellOrders(){
         return  Stream.of(
@@ -48,6 +48,7 @@ public class MatchingEngineTest {
     @ParameterizedTest
     @MethodSource("supplyBuyAndSellOrders")
     public void addOrdersReturnNonNUll(Order order){
+
         matchingEngine.placeLimitOrder(order);
         if (order.getSideOfOrder() ==Side.BUY){
             Assertions.assertFalse(matchingEngine.getBook().getBestBid().getValue().isEmpty());
@@ -65,8 +66,8 @@ public class MatchingEngineTest {
     @Test
     public void matchingOfOrders(){
         //
-        matchingEngine.placeLimitOrder(new Order.Builder().addSide(Side.BUY).build());
-        matchingEngine.placeLimitOrder(new Order.Builder().addSide(Side.SELL).build());
+        matchingEngine.placeLimitOrder(new Order.Builder().addSide(Side.BUY).addQuantity(1).addPrice(new BigDecimal(1)).build());
+        matchingEngine.placeLimitOrder(new Order.Builder().addSide(Side.SELL).addQuantity(1).addPrice(new BigDecimal(1)).build());
 
         var isEmptyBids = matchingEngine.getBook().getBestBid();
         var isEmptyAsks = matchingEngine.getBook().getBestAsk();
@@ -116,7 +117,7 @@ public class MatchingEngineTest {
                 .addQuantity(5).addSide(Side.BUY)
                 .build();
         Order orderBuy5b = new Order.Builder()
-                .addId("buy5a")
+                .addId("buy5b")
                 .addPrice(new BigDecimal(100))
                 .addQuantity(5).addSide(Side.BUY)
                 .build();
@@ -128,7 +129,7 @@ public class MatchingEngineTest {
         Order orderSell7 = new Order.Builder()
                 .addId("sell15a")
                 .addPrice(new BigDecimal(100))
-                .addQuantity(15).addSide(Side.SELL)
+                .addQuantity(7).addSide(Side.SELL)
                 .build();
 
         matchingEngine.placeLimitOrder(orderBuy5a);
@@ -163,4 +164,76 @@ public class MatchingEngineTest {
         );
 
     }
+    public static Stream<Arguments> supplyArgsForStatusTests(){
+        return Stream.of(
+                Arguments.of(new Order.Builder().addPrice(new BigDecimal(100)).addQuantity(10).addSide(Side.BUY).build(),
+                        new Order.Builder().addPrice(new BigDecimal(100)).addQuantity(15).addSide(Side.SELL).build(),
+                        new Order.Builder().addPrice(new BigDecimal(100)).addQuantity(5).addSide(Side.BUY).build()
+                        ),
+                Arguments.of(new Order.Builder().addPrice(new BigDecimal(100)).addQuantity(10).addSide(Side.BUY).build(),
+                        new Order.Builder().addPrice(new BigDecimal(100)).addQuantity(20).addSide(Side.SELL).build(),
+                        new Order.Builder().addPrice(new BigDecimal(100)).addQuantity(10).addSide(Side.BUY).build()
+                ),
+                Arguments.of(new Order.Builder().addPrice(new BigDecimal(100)).addQuantity(10).addSide(Side.SELL).build(),
+                        new Order.Builder().addPrice(new BigDecimal(100)).addQuantity(15).addSide(Side.BUY).build(),
+                        new Order.Builder().addPrice(new BigDecimal(99)).addQuantity(5).addSide(Side.SELL).build())
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("supplyArgsForStatusTests")
+    public void transitionTestNEWtoPATIALLYFILLED(Order order1, Order order2){
+        matchingEngine.placeLimitOrder(order1);
+        OrderStatus orderStatusBeforeMatching = order1.getStatus();
+        matchingEngine.placeLimitOrder(order2);
+        Assertions.assertAll(
+                ()->org.assertj.core.api.Assertions.assertThat(orderStatusBeforeMatching).isEqualTo(OrderStatus.NEW),
+                ()->org.assertj.core.api.Assertions.assertThat(order2.getStatus()).isEqualTo(OrderStatus.PARTIALLY_FILLED)
+        );
+
+
+    }
+    @ParameterizedTest
+    @MethodSource("supplyArgsForStatusTests")
+    public void transitionTestNEWtoFILLED(Order order1,Order order2, Order order3){
+        matchingEngine.placeLimitOrder(order1);
+        matchingEngine.placeLimitOrder(order2);
+        matchingEngine.placeLimitOrder(order3);
+        org.assertj.core.api.Assertions.assertThat(order2.getStatus()).isEqualTo(OrderStatus.FILLED);
+    }
+    @ParameterizedTest
+    @MethodSource("supplyArgsForStatusTests")
+    public void transitionTestNEWtoPATIALLYFILLEDtoFILLED(Order order1, Order order2, Order order3 ){
+
+        matchingEngine.placeLimitOrder(order1);
+        matchingEngine.placeLimitOrder(order2);
+        org.assertj.core.api.Assertions.assertThat(order2.getStatus()).isEqualTo(OrderStatus.PARTIALLY_FILLED);
+        matchingEngine.placeLimitOrder(order3);
+        org.assertj.core.api.Assertions.assertThat(order2.getStatus()).isEqualTo(OrderStatus.FILLED);
+    }@ParameterizedTest
+    @MethodSource("supplyArgsForStatusTests")
+    public void transitionTestNEWtoPATIALLYFILLEDtoCANCELLED(Order order1, Order order2, Order order3 ){
+
+        matchingEngine.placeLimitOrder(order1);
+        matchingEngine.placeLimitOrder(order2);
+        matchingEngine.getBook().cancelOrder(order2.getId());
+        Assertions.assertAll(
+                ()->   org.assertj.core.api.Assertions.assertThat(order2.getStatus()).isEqualTo(OrderStatus.CANCELLED),
+                ()-> org.assertj.core.api.Assertions.assertThat(order1.getStatus()).isEqualTo(OrderStatus.FILLED)
+        );
+
+    }
+    @ParameterizedTest
+    @MethodSource("supplyArgsForStatusTests")
+    public void transitionTestNEWtoCANCELLED(Order order1, Order order2, Order order3 ){
+
+        matchingEngine.placeLimitOrder(order1);
+        matchingEngine.getBook().cancelOrder(order1.getId());
+        matchingEngine.placeLimitOrder(order2);
+      Assertions.assertAll(
+              ()->  org.assertj.core.api.Assertions.assertThat(order2.getStatus()).isEqualTo(OrderStatus.NEW),
+              ()-> org.assertj.core.api.Assertions.assertThat(order1.getStatus()).isEqualTo(OrderStatus.CANCELLED)
+      );
+    }
+
 }
