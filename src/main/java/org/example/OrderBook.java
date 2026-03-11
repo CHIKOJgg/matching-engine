@@ -26,7 +26,6 @@ public class OrderBook {
        }
     }
     public void cancelOrder(String orderId){
-
         Order order = orderIndex.remove(orderId);
         if (order ==null){
             return;

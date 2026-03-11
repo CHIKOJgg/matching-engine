@@ -1,12 +1,12 @@
 package org.example.GUI;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
@@ -49,7 +49,8 @@ public class OrderBookGui extends Application{
         List<BookRow> asks = new ArrayList<>();
         synchronized (matchingEngine.getBook()) {
             ArrayList<Integer> bidsVolumes = new ArrayList<>();
-            ArrayList<Integer> asksVolumes = new ArrayList<>();;
+            ArrayList<Integer> asksVolumes = new ArrayList<>();
+            scanOrderBookAndCalcVolume();
             matchingEngine.getBook().bids.forEach((price, queue) -> {
 
                 int volume = queue.stream()
@@ -80,9 +81,6 @@ public class OrderBookGui extends Application{
                 ));
             });
 
-           //int maxAskVol =  Collections.max(asksVolumes);
-           //int maxBidVol =  Collections.max(bidsVolumes);
-
         }
 
         Platform.runLater(() -> {
@@ -97,61 +95,32 @@ public class OrderBookGui extends Application{
         configureTable(bidsTable);
         configureTable(asksTable);
         Label bidsLabel= new Label("BIDS");
+        bidsLabel.getStyleClass().addAll("section-label", "bids-label");
         Label asksLabel= new Label("ASKS");
-        Button buttonSell = new Button("SELL");
-        buttonSell.setStyle("-fx-text-fill:#cc2e2e; -fx-font-size:16px;");
-        Button buttonBuy = new Button("BUY");
-        buttonBuy.setStyle("-fx-text-fill:#2ecc71; -fx-font-size:16px;");
+        asksLabel.getStyleClass().addAll("section-label", "asks-label");
         TextField priceField = new TextField();
+
+        priceField.getStyleClass().add("input-label");
         TextField quantityField = new TextField();
-        buttonBuy.setOnAction(e->{
-            try{
-                String priceText = priceField.getText().trim();
-                String quantityText = quantityField.getText().trim();
-                if (priceText.isEmpty()||quantityText.isEmpty())
-                {
-                    showAlert("Error" , "please fill fields");
-                    return;
-                }
-                BigDecimal price = new BigDecimal(priceText);
-                int quantity  = Integer.parseInt(quantityText);
-                if (price.compareTo(BigDecimal.ZERO)<=0||quantity<=0){
-                    showAlert("Error" , "price and quantity should be more than 0");
-                    return;
-                }
-                Order order = new Order.Builder().addPrice(price).addQuantity(quantity).addSide(Side.BUY).build();
-                matchingEngine.placeLimitOrder(order);
-                priceField.clear();
-                quantityField.clear();
-            }catch (NumberFormatException ex){
-                showAlert("Error", "Wrong number format");
-            }
-        });
-        buttonSell.setOnAction(e->{
-            try{
-                String priceText = priceField.getText().trim();
-                String quantityText = quantityField.getText().trim();
-                if (priceText.isEmpty()||quantityText.isEmpty())
-                {
-                    showAlert("Error" , "please fill fields");
-                    return;
-                }
-                BigDecimal price = new BigDecimal(priceText);
-                int quantity  = Integer.parseInt(quantityText);
-                if (price.compareTo(BigDecimal.ZERO)<=0||quantity<=0){
-                    showAlert("Error" , "price and quantity should be more than 0");
-                    return;
-                }
-                Order order = new Order.Builder().addPrice(price).addQuantity(quantity).addSide(Side.SELL).build();
-                matchingEngine.placeLimitOrder(order);
-                priceField.clear();
-                quantityField.clear();
-            }catch (NumberFormatException ex){
-                showAlert("Error", "Wrong number format");
-            }
-        });
-        HBox controls = new HBox(10, new Label("Price"), priceField, new Label("Quantity"), quantityField, buttonBuy,buttonSell);
+        priceField.getStyleClass().add("input-label");
+
+        Button buttonSell = createButton("SELL");
+        buttonSell.setOnAction(actionButtonEventEventHandler(Side.SELL, priceField, quantityField));
+        buttonSell.getStyleClass().addAll("button", "button-sell");
+
+        Button buttonCancel = createButton("CANCEL");
+        buttonCancel.getStyleClass().addAll("button", "button-cancel");
+
+        Button buttonBuy = createButton("BUY");
+        buttonBuy.setOnAction(actionButtonEventEventHandler(Side.BUY, priceField, quantityField));
+        buttonBuy.getStyleClass().addAll("button", "button-buy");
+
+
+
+        HBox controls = new HBox(10, new Label("Price"), priceField, new Label("Quantity"), quantityField, buttonBuy,buttonSell ,buttonCancel);
+        controls.getStyleClass().add("controls-panel");
         controls.setPadding(new Insets(15));
+
         controls.setAlignment(Pos.CENTER_LEFT);
 
         bidsLabel.setStyle("-fx-text-fill:#2ecc71; -fx-font-size:16px;");
@@ -162,8 +131,13 @@ public class OrderBookGui extends Application{
         VBox root  =new VBox(10, controls,tables);
         root.setPadding(new Insets(15));
         tables.setPadding(new Insets(10));
-        Scene scene= new Scene(root, 600,1000);
-        root.setStyle("-fx-fill:rgba(88,97,92,0.7);");
+        Scene scene= new Scene(root, 1000,800);
+        scene.getStylesheets().addAll(
+                getClass().getResource("/styles/material-theme.css").toExternalForm(),
+                getClass().getResource("/styles/material-fields.css").toExternalForm(),
+                getClass().getResource("/styles/material-buttons.css").toExternalForm(),
+                getClass().getResource("/styles/material-tables.css").toExternalForm()
+        );
         VBox.setVgrow(bidsTable, Priority.ALWAYS);
         VBox.setVgrow(asksTable, Priority.ALWAYS);
         // configureTable();
@@ -203,6 +177,41 @@ public class OrderBookGui extends Application{
         alert.setContentText(message
         );
         alert.showAndWait();
+    }
+    private Button createButton(String buttonName) {
+        Button button = new Button();
+        button.setText(buttonName);
+        return button;
+    }
+    private EventHandler<ActionEvent> actionButtonEventEventHandler(Side side, TextField priceField, TextField quantityField) throws NumberFormatException{
+        return actionEvent -> {
+            try{
+                String priceText = priceField.getText().trim();
+                String quantityText = quantityField.getText().trim();
+                if (priceText.isEmpty()||quantityText.isEmpty())
+                {
+                    showAlert("Error" , "please fill fields");
+                    return;
+                }
+                BigDecimal price = new BigDecimal(priceText);
+                int quantity  = Integer.parseInt(quantityText);
+                if (price.compareTo(BigDecimal.ZERO)<=0||quantity<=0){
+                    showAlert("Error" , "price and quantity should be more than 0");
+                    clearTextFields(priceField,quantityField);
+                    return;
+                }
+
+                Order order = new Order.Builder().addPrice(price).addQuantity(quantity).addSide(side).build();
+                matchingEngine.placeLimitOrder(order);
+                clearTextFields(priceField,quantityField);
+            }catch (NumberFormatException ex){
+                showAlert("Error", "Wrong number format");
+            }
+        };
+    }
+    private void clearTextFields(TextField priceField, TextField quantityField ){
+        priceField.clear();
+        quantityField.clear();
     }
 
 }

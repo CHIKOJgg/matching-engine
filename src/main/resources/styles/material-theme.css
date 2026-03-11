@@ -1,12 +1,37 @@
 .root {
     -fx-background-color: #1e1e2f;
-    -fx-font-family: 'Segoe UI', 'Roboto', sans-serif;
+    -fx-font-family: 'Roboto', 'Segoe UI', sans-serif;
     -fx-font-size: 14px;
 }
 
+/* Панель управления (HBox) */
 .controls-panel {
     -fx-background-color: #2d2d3a;
-    -fx-background-radius: 8px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 2);
-    -fx-padding: 15px;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.4), 10, 0.2, 0, 2);
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+    -fx-alignment: center-left;
+}
+
+/* Заголовки секций BIDS/ASKS */
+.section-label {
+    -fx-font-size: 18px;
+    -fx-font-weight: 800;
+    -fx-padding: 10 0 5 0;
+}
+
+.bids-label {
+    -fx-text-fill: #2ecc71;
+}
+
+.asks-label {
+    -fx-text-fill: #e74c3c;
+}
+
+/* Метки для полей ввода */
+.input-label {
+    -fx-text-fill: #bbbbcc;
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
 }
