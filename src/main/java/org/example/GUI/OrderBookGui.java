@@ -11,9 +11,8 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import javafx.animation.AnimationTimer;
 import javafx.beans.property.*;
-import org.example.BookRow;
 import org.example.MatchingEngine;
-import org.example.Order;
+import org.example.domains.Order;
 import org.example.Side;
 
 import java.math.BigDecimal;
@@ -50,7 +49,7 @@ public class OrderBookGui extends Application{
         synchronized (matchingEngine.getBook()) {
             ArrayList<Integer> bidsVolumes = new ArrayList<>();
             ArrayList<Integer> asksVolumes = new ArrayList<>();
-            scanOrderBookAndCalcVolume();
+           // scanOrderBookAndCalcVolume();
             matchingEngine.getBook().bids.forEach((price, queue) -> {
 
                 int volume = queue.stream()

@@ -1,5 +1,5 @@
 import org.example.MatchingEngine;
-import org.example.Order;
+import org.example.domains.Order;
 import org.example.OrderStatus;
 import org.example.Side;
 import org.junit.jupiter.api.Assertions;

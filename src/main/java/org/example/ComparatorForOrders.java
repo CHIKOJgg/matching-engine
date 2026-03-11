@@ -1,5 +1,7 @@
 package org.example;
 
+import org.example.domains.Order;
+
 import java.util.Comparator;
 
 public class ComparatorForOrders implements Comparator<Order> {
