@@ -1,0 +1,12 @@
+.root {
+    -fx-background-color: #1e1e2f;
+    -fx-font-family: 'Segoe UI', 'Roboto', sans-serif;
+    -fx-font-size: 14px;
+}
+
+.controls-panel {
+    -fx-background-color: #2d2d3a;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 2);
+    -fx-padding: 15px;
+}
