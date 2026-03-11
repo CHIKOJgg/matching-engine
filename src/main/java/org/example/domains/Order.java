@@ -1,13 +1,13 @@
 package org.example;
 
-import javax.swing.*;
+import org.example.domains.User;import javax.swing.*;
 import java.math.BigDecimal;
 import java.security.PublicKey;
 import java.time.LocalTime;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Order implements Comparable<Order>{
+public class Order implements Comparable<User.Order>{
 
     private final String id;
     private final BigDecimal price;
@@ -64,8 +64,8 @@ public class Order implements Comparable<Order>{
             this.status = status;
             return this;
         }
-        public Order build(){
-            return new Order(this);
+        public User.Order build(){
+            return new User.Order(this);
         }
 
 
@@ -149,7 +149,7 @@ public class Order implements Comparable<Order>{
 
 
     @Override
-    public int compareTo(Order o) {
+    public int compareTo(User.Order o) {
        return this.getPrice().compareTo(o.getPrice());
 
     }
