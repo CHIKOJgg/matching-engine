@@ -163,7 +163,7 @@ public class OrderBookGui extends Application{
         root.setPadding(new Insets(15));
         tables.setPadding(new Insets(10));
         Scene scene= new Scene(root, 600,1000);
-
+        root.setStyle("-fx-fill:rgba(88,97,92,0.7);");
         VBox.setVgrow(bidsTable, Priority.ALWAYS);
         VBox.setVgrow(asksTable, Priority.ALWAYS);
         // configureTable();
