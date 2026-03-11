@@ -11,8 +11,8 @@ import java.util.logging.Logger;
 
 public class OrderBook {
 
-    TreeMap<BigDecimal, ArrayDeque<Order>> bids =new TreeMap<>(Comparator.reverseOrder());
-    TreeMap<BigDecimal, ArrayDeque<Order>> asks =new TreeMap<>(Comparator.reverseOrder());
+    public TreeMap<BigDecimal, ArrayDeque<Order>> bids =new TreeMap<>(Comparator.reverseOrder());
+    public TreeMap<BigDecimal, ArrayDeque<Order>> asks =new TreeMap<>(Comparator.reverseOrder());
     Map<String ,Order> orderIndex =new HashMap<>();
      synchronized void addOrder(Order order){
        orderIndex.put(order.getId(), order);

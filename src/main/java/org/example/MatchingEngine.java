@@ -55,7 +55,6 @@ public class MatchingEngine {
                         bestAsk = book.getBestAsk();
                         continue;
                     }
-                    int quantity = top.getQuantity();
                     int executed = Math.min(top.getQuantity(),remainingQ);
                     remainingQ-=executed;
                     top.setQuantity(top.getQuantity() -executed);
@@ -73,7 +72,7 @@ public class MatchingEngine {
                 order.setStatus(OrderStatus.PARTIALLY_FILLED);
             }
             if (remainingQ > 0) {
-             //   order.setStatus(OrderStatus.PARTIALLY_FILLED);
+
                 order.setQuantity(remainingQ);
                 book.addOrder(order);
             }

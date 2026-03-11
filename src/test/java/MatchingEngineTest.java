@@ -28,7 +28,6 @@ public class MatchingEngineTest {
         );
     }
 
-
     @BeforeEach
     public void setUp(){
         this.matchingEngine = new MatchingEngine();
@@ -37,8 +36,8 @@ public class MatchingEngineTest {
     public void deleteOrderTest(){
         matchingEngine.placeLimitOrder(new Order());
         Assertions.assertTrue(true);
-       //Mockito.when(matchingEngine.placeLimitOrder(new Order())).then(true);
-       // Mockito.doReturn(true).when(matchingEngine).placeLimitOrder(new Order());
+        // Mockito.when(matchingEngine.placeLimitOrder(new Order())).then(true);
+        // Mockito.doReturn(true).when(matchingEngine).placeLimitOrder(new Order());
     }
     public static Stream<Arguments> supplyBuyAndSellOrders(){
         return  Stream.of(
@@ -49,6 +48,7 @@ public class MatchingEngineTest {
     @ParameterizedTest
     @MethodSource("supplyBuyAndSellOrders")
     public void addOrdersReturnNonNUll(Order order){
+
         matchingEngine.placeLimitOrder(order);
         if (order.getSideOfOrder() ==Side.BUY){
             Assertions.assertFalse(matchingEngine.getBook().getBestBid().getValue().isEmpty());
